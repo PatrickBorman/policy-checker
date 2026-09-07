@@ -44,7 +44,11 @@ variables, each rule quoting the sentence it encodes from *Configure permissions
 
 ### Silences — combinations no page decides
 
-5. **Hook `allow` on a tool that requires user interaction** (`AskUserQuestion`, MCP `requiresUserInteraction`,
+5. **Hook `allow` on a tool that requires user interaction** — TESTED, see HOOK_TEST.md: the ask-rule proxy shows the implementation does NOT let a hook allow bypass the gate; documentation bug, not a bypass.
+
+   Original reading kept below for the record:
+
+    (`AskUserQuestion`, MCP `requiresUserInteraction`,
    connector tools an org set to `ask`). These "prompt you directly even when an allow *rule* matches" and are
    listed under "actions no mode auto-approves"; hooks are not mentioned. Under finding 1's hooks-page reading, a
    hook `allow` skips the consent step; under the permissions-page reading it does not. This is the one with a
