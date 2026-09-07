@@ -41,9 +41,17 @@ refund is open leaves the controller with no legal move.
    realisability, Y-satisfiability, unrealizable core, minimised counter-strategy.
 4. `policy_checker/evaluate.py` - evaluates the emitted constraints on the counter-strategy's states so the
    trace says *which rule* each losing controller response violates.
-5. `policy_checker/repair.py` - hook into the interpolation-based assumption-refinement engine (MSc thesis,
-   `~/Documents/interpolation-repair`) that proposes the minimal environment assumption restoring realisability.
-   Needs MathSAT 4 (Linux binary); reported as unavailable on macOS rather than faked.
+5. `policy_checker/repair.py` - runs the interpolation-based assumption-refinement engine (MSc thesis,
+   `~/Documents/interpolation-repair`), which proposes the environment assumption that restores realisability:
+   ```
+   minimal repair - add this assumption about the environment and every rule becomes enforceable  (2.4s):
+       assumption G(!(!user_confirm & req_send & refund_open));
+   ```
+   The engine's interpolator is MathSAT 4, a Linux-only binary. On macOS its hardcoded path now resolves to a
+   Python stand-in (`MathSAT4/.../bin/mathsat`) that computes a Craig interpolant on a BDD - the strongest
+   interpolant (existential projection of the A-side) weakened by greedily dropping literals while I & B stays
+   unsat. Same contract, same file formats; the engine code is untouched. Interpolants differ from MathSAT's, so
+   the *particular* repair found can differ from the thesis runs.
 
 ## Run
 
@@ -51,6 +59,7 @@ refund is open leaves the controller with no legal move.
 python -m policy_checker check policies/email_agent.yaml            # Claude translation, then check
 python -m policy_checker check policies/email_agent.yaml --no-llm   # hand-written encodings
 python -m policy_checker batch policies/ [--no-llm] [--json]        # every set + conflict-rate summary
+python -m policy_checker batch policies/ --no-llm --repair          # ... and run the repair engine on the conflicts
 ```
 Outputs go to `out/`: the `.spectra` file, the translation JSON, the raw counter-strategy, `results.json`.
 
@@ -74,7 +83,8 @@ rules that need them are encoded to the nearest GR(1) meaning and flagged `appro
 
 ## Status
 
-- Manual path: works end to end on the three example sets (2 of 3 unrealisable, by design).
-- Claude path: implemented, awaiting an API key to run. The interesting measurement is translation fidelity:
-  does the LLM encoding reach the same verdict and core as the hand-written one?
-- Repair: the engine is wired but needs Linux/MathSAT.
+- Manual path, check + explain + repair: works end to end on the three example sets on macOS
+  (2 of 3 unrealisable by design; both repaired in ~2.4s each).
+- Claude path: implemented and validated offline, not yet run against the API (no key on this machine).
+  With `spectra:` reference encodings present, `check` also reports whether the LLM translation reaches the
+  same verdict and core as the hand-written one - that agreement rate is the first number for the write-up.

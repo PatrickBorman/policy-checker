@@ -48,6 +48,11 @@ def check_one(path: Path, out_dir: Path, use_llm: bool, model: str, timeout: int
     res["realizable"] = realizable
     res["t_check_s"] = round(time.time() - t1, 2)
     if realizable:
+        if use_llm and all(r.spectra for r in ps.rules):
+            mtext, _ = emit_spectra(ps, ps.manual_constraints())
+            mspec = out_dir / f"{ps.name}.manual.spectra"; mspec.write_text(mtext)
+            res["manual_realizable"] = S.check_realizable(mspec, timeout)
+            res["agrees_with_manual"] = res["manual_realizable"] is True
         return res
 
     res["y_sat"] = S.check_y_sat(spec, timeout)
@@ -58,11 +63,26 @@ def check_one(path: Path, out_dir: Path, use_llm: bool, model: str, timeout: int
     res["counter_trace"] = trace
     (out_dir / f"{ps.name}.{tag}.counterstrategy.txt").write_text(cs.raw)
 
+    if use_llm and all(r.spectra for r in ps.rules):
+        # translation fidelity: does the LLM encoding reach the same verdict and core as the hand-written one?
+        mtext, mmap = emit_spectra(ps, ps.manual_constraints())
+        mspec = out_dir / f"{ps.name}.manual.spectra"
+        mspec.write_text(mtext)
+        mreal = S.check_realizable(mspec, timeout)
+        res["manual_realizable"] = mreal
+        if not mreal:
+            res["manual_core_rules"] = sorted({mmap.get(i, f"line{i}") for i in S.unrealizable_core(mspec, timeout)})
+        res["agrees_with_manual"] = (mreal == realizable) and (mreal or res.get("core_rules") == res.get("manual_core_rules"))
+
     if do_repair:
         try:
-            res["repair"] = R.run(spec, out_dir)
+            rep = R.run(spec, out_dir / "repair")
+            res["repairs"] = rep["repairs"]
+            res["t_repair_s"] = rep["seconds"]
+            res["repair_nodes"] = rep["nodes"]
+            (out_dir / f"{ps.name}.{tag}.repair.log").write_text(rep["log"])
         except Exception as e:
-            res["repair"] = f"not run: {e}"
+            res["repair_error"] = str(e)
     return res
 
 
@@ -72,6 +92,9 @@ def render(res: dict, ps_desc: str = "") -> str:
         return "\n".join(L + [f"ERROR: {res['error']}"])
     if res.get("approximate_rules"):
         L.append(f"approximate encodings: {', '.join(res['approximate_rules'])}")
+    if "agrees_with_manual" in res:
+        L.append("translation vs hand-written encoding: " + ("same verdict and core" if res["agrees_with_manual"] else
+                 f"DISAGREES (manual: {'realisable' if res['manual_realizable'] else 'unrealisable core=' + ','.join(res.get('manual_core_rules', []))})"))
     if res["realizable"]:
         L.append(f"REALISABLE - a controller exists that satisfies every rule against any environment.  ({res['t_check_s']}s)")
         return "\n".join(L)
@@ -81,8 +104,15 @@ def render(res: dict, ps_desc: str = "") -> str:
     L.append(f"conflicting rules (minimal core): {', '.join(res['core_rules'])}")
     L.append("counter-trace - a run the environment can force:")
     L.append(res["counter_trace"])
-    if "repair" in res:
-        L.append("repair: " + res["repair"].strip().splitlines()[0] if res["repair"].strip() else "repair: (no output)")
+    if "repairs" in res:
+        if res["repairs"]:
+            L.append(f"minimal repair - add this assumption about the environment and every rule becomes enforceable  ({res['t_repair_s']}s, {res['repair_nodes']} candidates):")
+            for r in res["repairs"]:
+                L.append(f"    assumption {r};")
+        else:
+            L.append(f"repair: none found within the budget ({res['t_repair_s']}s, {res['repair_nodes']} candidates)")
+    if "repair_error" in res:
+        L.append(f"repair: not run - {res['repair_error']}")
     return "\n".join(L)
 
 
@@ -114,6 +144,10 @@ def main(argv=None):
         print(f"== {n} policy sets, {len(unreal)} unrealisable ({100*len(unreal)/n:.0f}%)")
         for r in results:
             status = "ERROR" if "error" in r else ("REALISABLE" if r["realizable"] else f"UNREALISABLE core={','.join(r['core_rules'])}")
+            if r.get("repairs"):
+                status += f"  repaired by: {r['repairs'][0]}"
+            if "agrees_with_manual" in r:
+                status += "  [translation " + ("agrees" if r["agrees_with_manual"] else "DISAGREES") + " with manual]"
             print(f"   {r['policy_set']:32s} {status}")
     (out / "results.json").write_text(json.dumps(results, indent=2))
     return 0
