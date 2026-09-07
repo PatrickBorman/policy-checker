@@ -3,6 +3,9 @@
 # (conda env create -f environment.yml && conda activate policy-checker) or with any JDK >= 17 on PATH.
 set -euo pipefail
 cd "$(dirname "$0")"
+# conda-forge's openjdk lives under $CONDA_PREFIX/lib/jvm; `conda activate` sets JAVA_HOME, but cover the case it didn't
+[ -z "${JAVA_HOME:-}" ] && [ -n "${CONDA_PREFIX:-}" ] && [ -x "$CONDA_PREFIX/lib/jvm/bin/java" ] && export JAVA_HOME="$CONDA_PREFIX/lib/jvm"
+[ -n "${JAVA_HOME:-}" ] && export PATH="$JAVA_HOME/bin:$PATH"
 JAVAC="${JAVAC:-$(command -v javac || true)}"
 [ -n "${JAVA_HOME:-}" ] && [ -x "$JAVA_HOME/bin/javac" ] && JAVAC="$JAVA_HOME/bin/javac"
 # `dd` (BDD library used by the repair engine) ships as an sdist whose setup.py needs pkg_resources, which is

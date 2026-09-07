@@ -4,6 +4,7 @@ from __future__ import annotations
 import os
 import re
 import subprocess
+import sys
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -21,7 +22,8 @@ def _find_java() -> str:
     if os.environ.get("JAVA_HOME"):
         return str(Path(os.environ["JAVA_HOME"]) / "bin/java")
     import subprocess as sp
-    for cand in (shutil.which("java"),
+    conda = os.environ.get("CONDA_PREFIX") or str(Path(sys.executable).parent.parent)
+    for cand in (str(Path(conda) / "lib/jvm/bin/java"), shutil.which("java"),
                  "/opt/homebrew/opt/openjdk/bin/java", "/usr/local/opt/openjdk/bin/java",
                  "/usr/local/Cellar/openjdk/22.0.2/libexec/openjdk.jdk/Contents/Home/bin/java"):
         # macOS ships a /usr/bin/java stub that only prints "Unable to locate a Java Runtime"; test-run each candidate
