@@ -156,7 +156,7 @@ def make_client():
     return AnthropicVertex(project_id=project, region=region)
 
 
-GEMINI_MODEL = "gemini-2.5-pro"
+GEMINI_MODEL = "gemini-3.5-flash"   # free tier; 2.5-pro has a free-tier limit of 0
 
 
 class GeminiClient:

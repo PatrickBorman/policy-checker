@@ -1,0 +1,82 @@
+[
+  {
+    "policy_set": "coding_agent_permissions",
+    "source": "policies/coding_agent_permissions.yaml",
+    "mode": "llm",
+    "rules": 5,
+    "translator": "gemini-3.5-flash",
+    "approximate_rules": [],
+    "t_translate_s": 7.01,
+    "spectra": "out/coding_agent_permissions.llm.spectra",
+    "realizable": true,
+    "t_check_s": 2.03,
+    "manual_realizable": true,
+    "agrees_with_manual": true
+  },
+  {
+    "policy_set": "email_agent",
+    "source": "policies/email_agent.yaml",
+    "mode": "llm",
+    "rules": 5,
+    "translator": "gemini-3.5-flash",
+    "approximate_rules": [],
+    "t_translate_s": 6.04,
+    "spectra": "out/email_agent.llm.spectra",
+    "realizable": false,
+    "t_check_s": 1.78,
+    "y_sat": true,
+    "core_rules": [
+      "G1",
+      "G2",
+      "G3",
+      "G4"
+    ],
+    "counter_trace": "step 0:  environment: req_send, refund_open    [not: user_confirm]\n         controller:  escalate    [not: allow, block]\nstep 1:  environment: req_send, refund_open    [not: user_confirm]\n         controller:  no response satisfies every rule:\n             (nothing)    [not: allow, block, escalate] violates G1\n             block    [not: allow, escalate]          violates G4\n             allow    [not: block, escalate]          violates G2\n             allow, block    [not: escalate]          violates G1, G2, G4\n             escalate    [not: allow, block]          violates G3\n             block, escalate    [not: allow]          violates G1, G3, G4\n             allow, escalate    [not: block]          violates G1, G2, G3\n             allow, block, escalate                   violates G1, G2, G3, G4",
+    "manual_realizable": false,
+    "manual_core_rules": [
+      "G1",
+      "G2",
+      "G3",
+      "G4"
+    ],
+    "agrees_with_manual": true,
+    "repairs": [
+      "G(!(!user_confirm & req_send & refund_open))"
+    ],
+    "t_repair_s": 3.28,
+    "repair_nodes": 2
+  },
+  {
+    "policy_set": "trusted_monitoring",
+    "source": "policies/trusted_monitoring.yaml",
+    "mode": "llm",
+    "rules": 5,
+    "translator": "gemini-3.5-flash",
+    "approximate_rules": [],
+    "t_translate_s": 9.8,
+    "spectra": "out/trusted_monitoring.llm.spectra",
+    "realizable": false,
+    "t_check_s": 1.34,
+    "y_sat": true,
+    "core_rules": [
+      "G1",
+      "G2",
+      "G3",
+      "G4"
+    ],
+    "counter_trace": "step 0:  environment: output_ready, flagged, budget_exhausted    [not: trusted_available]\n         controller:  no response satisfies every rule:\n             (nothing)    [not: use_untrusted, defer_trusted, audit] violates G1\n             audit    [not: use_untrusted, defer_trusted] violates G3\n             defer_trusted    [not: use_untrusted, audit] violates G4\n             defer_trusted, audit    [not: use_untrusted] violates G1, G3, G4\n             use_untrusted    [not: defer_trusted, audit] violates G2\n             use_untrusted, audit    [not: defer_trusted] violates G1, G2, G3\n             use_untrusted, defer_trusted    [not: audit] violates G1, G2, G4\n             use_untrusted, defer_trusted, audit      violates G1, G2, G3, G4",
+    "manual_realizable": false,
+    "manual_core_rules": [
+      "G1",
+      "G2",
+      "G3",
+      "G4"
+    ],
+    "agrees_with_manual": true,
+    "repairs": [
+      "G(!(budget_exhausted & !trusted_available & flagged & output_ready))"
+    ],
+    "t_repair_s": 2.58,
+    "repair_nodes": 3
+  }
+]

@@ -63,7 +63,10 @@ python -m policy_checker batch policies/ --no-llm --repair          # ... and ru
 ```
 Outputs go to `out/`: the `.spectra` file, the translation JSON, the raw counter-strategy, `results.json`.
 
-Translation needs `ANTHROPIC_API_KEY` in the environment (or `ant auth login`).
+Translation backends, picked from the environment: `ANTHROPIC_API_KEY` (Claude), `GEMINI_API_KEY` (Gemini,
+free tier is enough - default model `gemini-3.5-flash`), or `GOOGLE_CLOUD_PROJECT` + `gcloud auth application-default
+login` (Claude on Vertex AI). Force one with `POLICY_CHECKER_PROVIDER=anthropic|gemini|vertex`.
+Keep keys in `~/.config/policy-checker/env` and `source` it.
 
 ## Requirements
 
@@ -85,6 +88,7 @@ rules that need them are encoded to the nearest GR(1) meaning and flagged `appro
 
 - Manual path, check + explain + repair: works end to end on the three example sets on macOS
   (2 of 3 unrealisable by design; both repaired in ~2.4s each).
-- Claude path: implemented and validated offline, not yet run against the API (no key on this machine).
-  With `spectra:` reference encodings present, `check` also reports whether the LLM translation reaches the
-  same verdict and core as the hand-written one - that agreement rate is the first number for the write-up.
+- LLM path (Gemini 3.5 Flash, 7 Sep 2026): all 15 rules translated on the first attempt with no validator
+  feedback; all three sets reach the same verdict and the same minimal core as the hand-written encodings;
+  the two conflicts repair to the same assumptions. 3 of 3 agreement. `results.json` holds the run.
+- Claude backends are implemented but have not been exercised (no key).
