@@ -1,0 +1,9 @@
+Found 1 unrealizable core system variables.
+At line 11 variable audit.
+
+Initial Dead State Sf0 <tool_call:true, initial_above_defer:true, min_resample_above_defer:true, min_above_audit:true, budget_exhausted:false, audit:false>
+	With successors : Sf2
+Initial Dead State Sf1 <tool_call:true, initial_above_defer:true, min_resample_above_defer:true, min_above_audit:true, budget_exhausted:false, audit:true>
+	With successors : Sf2
+Dead State Sf2 <tool_call:false, initial_above_defer:false, min_resample_above_defer:false, min_above_audit:false, budget_exhausted:false>
+	With no successors.

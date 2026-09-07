@@ -1,0 +1,35 @@
+module sc1_dtt_audit_shutdown
+
+env boolean tool_call;
+env boolean above_defer;
+env boolean above_audit;
+env boolean budget_exhausted;
+env boolean excess_suspicion;
+sys boolean use_untrusted;
+sys boolean use_trusted;
+sys boolean audit;
+sys boolean shutdown;
+sys boolean pass_through;
+
+// L0
+// L0
+// L0
+// G1
+// G2
+// G3
+// G4
+// A1
+assumption
+	G (above_audit -> above_defer);
+// A1
+assumption
+	G (excess_suspicion -> tool_call);
+
+assumption
+	G(!(above_audit & tool_call & budget_exhausted));
+guarantee
+	G(excess_suspicion->shutdown);
+guarantee
+	G((tool_call&above_audit)->audit);
+guarantee
+	G(!(use_untrusted&use_trusted)&!(use_untrusted&audit)&!(use_untrusted&shutdown)&!(use_trusted&audit)&!(use_trusted&shutdown)&!(audit&shutdown));

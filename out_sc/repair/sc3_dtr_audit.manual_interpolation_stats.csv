@@ -1,0 +1,2 @@
+Filename,NumRepairs,RepairLimit,TimeToFirst,Runtime,Timeout,TimedOut,NodesExplored,DuplicateNodes,NumInterpolantsComputed,NumNonStateSeparable
+/Users/patrickborman/Documents/policy-checker/out_sc/sc3_dtr_audit.manual.spectra,1,1,0.6747263960000001,0.6753512210000001,120.0,False,4,0,3,0

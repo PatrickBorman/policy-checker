@@ -1,0 +1,81 @@
+Using BDD Package: CUDDFactory, Version: CUDD 3.0
+Using BDD Package: CUDDFactory, Version: CUDD 3.0
+
+
+=== ARGS ===
+ALL GARS: False
+MINIMIZE SPEC: True
+USE INFLUENTIAL: True
+TIMEOUT: 120.0
+REPAIR LIMIT: 1
+
+
+++++ ELAPSED TIME: 3.5780000002816337e-06
+++++ QUEUE LENGTH: 0
+++++ Solutions: 0
+++++ Duplicates: 0
+++++ Node number: 1
+++++ Refinement: []
+++++ Length: 0
+++ Y-SAT CHECK
+++ REALIZABILITY CHECK
+++ COUNTERSTRATEGY COMPUTATION - REFINEMENT GENERATION
+
+=== COUNTERRUN ===
+Sf1 -> Sf2
+
+
+=== INTERPOLANT ===
+(budget_exhausted__Sf1 & min_above_audit__Sf1 & tool_call__Sf1)
+
+
+++++ ELAPSED TIME: 0.20369362600000018
+++++ QUEUE LENGTH: 1
+++++ Solutions: 0
+++++ Duplicates: 0
+++++ Node number: 2
+++++ Refinement: ['G(!(budget_exhausted & tool_call & min_above_audit))']
+++++ Length: 1
+++ Y-SAT CHECK
+++ REALIZABILITY CHECK
+++ COUNTERSTRATEGY COMPUTATION - REFINEMENT GENERATION
+
+=== COUNTERRUN ===
+Sf2 -> Sf4
+
+
+=== INTERPOLANT ===
+(initial_above_defer__Sf2 & min_above_audit__Sf2 & min_resample_above_defer__Sf2 & tool_call__Sf2)
+
+
+++++ ELAPSED TIME: 0.4299837470000001
+++++ QUEUE LENGTH: 2
+++++ Solutions: 0
+++++ Duplicates: 0
+++++ Node number: 3
+++++ Refinement: ['!(budget_exhausted & tool_call & min_above_audit)']
+++++ Length: 1
+++ Y-SAT CHECK
+++ REALIZABILITY CHECK
+++ COUNTERSTRATEGY COMPUTATION - REFINEMENT GENERATION
+
+=== COUNTERRUN ===
+S0 -> Sf2 -> Sf4
+
+
+=== INTERPOLANT ===
+(budget_exhausted__Sf2 & min_above_audit__Sf2 & tool_call__Sf2)
+
+
+++++ ELAPSED TIME: 0.6394575659999999
+++++ QUEUE LENGTH: 2
+++++ Solutions: 0
+++++ Duplicates: 0
+++++ Node number: 4
+++++ Refinement: ['G(!(budget_exhausted & tool_call & min_above_audit))', 'G(!(tool_call & min_above_audit & min_resample_above_defer & initial_above_defer))']
+++++ Length: 2
+++ Y-SAT CHECK
+++ REALIZABILITY CHECK
+++ REALIZABLE REFINEMENT: SAT CHECK
+
+++++ SAVING SEARCH SUMMARY DATA

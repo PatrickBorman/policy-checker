@@ -1,5 +1,45 @@
 [
   {
+    "policy_set": "ca_defer_to_resample",
+    "source": "policies_controlarena/ca_defer_to_resample.yaml",
+    "mode": "manual",
+    "rules": 4,
+    "t_translate_s": 0.0,
+    "spectra": "out_ca/ca_defer_to_resample.manual.spectra",
+    "realizable": true,
+    "t_check_s": 2.08
+  },
+  {
+    "policy_set": "ca_defer_to_trusted",
+    "source": "policies_controlarena/ca_defer_to_trusted.yaml",
+    "mode": "manual",
+    "rules": 3,
+    "t_translate_s": 0.0,
+    "spectra": "out_ca/ca_defer_to_trusted.manual.spectra",
+    "realizable": true,
+    "t_check_s": 1.66
+  },
+  {
+    "policy_set": "ca_trusted_editing",
+    "source": "policies_controlarena/ca_trusted_editing.yaml",
+    "mode": "manual",
+    "rules": 3,
+    "t_translate_s": 0.0,
+    "spectra": "out_ca/ca_trusted_editing.manual.spectra",
+    "realizable": true,
+    "t_check_s": 1.74
+  },
+  {
+    "policy_set": "ca_trusted_monitoring",
+    "source": "policies_controlarena/ca_trusted_monitoring.yaml",
+    "mode": "manual",
+    "rules": 2,
+    "t_translate_s": 0.0,
+    "spectra": "out_ca/ca_trusted_monitoring.manual.spectra",
+    "realizable": true,
+    "t_check_s": 1.59
+  },
+  {
     "policy_set": "whatif_dtt_online_audit",
     "source": "policies_controlarena/whatif_dtt_online_audit.yaml",
     "mode": "manual",
@@ -7,17 +47,12 @@
     "t_translate_s": 0.0,
     "spectra": "out_ca/whatif_dtt_online_audit.manual.spectra",
     "realizable": false,
-    "t_check_s": 1.21,
+    "t_check_s": 1.69,
     "y_sat": true,
     "core_rules": [
       "R4",
       "R5"
     ],
-    "counter_trace": "step 0:  environment: tool_call, above_defer, above_audit, budget_exhausted\n         controller:  no response satisfies every rule:\n             (nothing)    [not: audit]                violates R4\n             audit                                    violates R5",
-    "repairs": [
-      "G(!(above_audit & budget_exhausted & tool_call))"
-    ],
-    "t_repair_s": 2.81,
-    "repair_nodes": 3
+    "counter_trace": "step 0:  environment: tool_call, above_defer, above_audit, budget_exhausted\n         controller:  no response satisfies every rule:\n             (nothing)    [not: audit]                violates R2, R4\n             audit                                    violates R5"
   }
 ]

@@ -1,0 +1,51 @@
+name: sc1_dtt_audit_shutdown
+description: >
+  ControlArena defer_to_trusted (online routing, total on its own) composed with the two obligations the AI
+  Control paper states but ControlArena computes post-hoc: audit the top 2% most suspicious, and shut down when
+  the untrusted model produces significantly more suspicious solutions than expected. Both brought online.
+provenance: >
+  routing: control-arena _defer_to_trusted.py @ b9d19de. audit + shutdown: Greenblatt et al. 2023 trusted monitoring
+  ("audit the top 2% most suspicious"; "shutting down if the untrusted model produces significantly more
+  suspicious solutions than expected"). Composition is online enforcement of both, as any live deployment must do.
+env:
+  - {name: tool_call, desc: the untrusted policy proposes a tool call}
+  - {name: above_defer, desc: suspicion_score > defer_threshold}
+  - {name: above_audit, desc: suspicion_score in the top 2% (audit threshold)}
+  - {name: budget_exhausted, desc: the human audit budget is spent}
+  - {name: excess_suspicion, desc: the untrusted model is significantly more suspicious than expected this step}
+sys:
+  - {name: use_untrusted, desc: execute the untrusted action}
+  - {name: use_trusted, desc: execute the trusted policy's action}
+  - {name: audit, desc: route to a human auditor}
+  - {name: shutdown, desc: halt the deployment}
+  - {name: pass_through, desc: no tool call, return unchanged}
+rules:
+  - id: L0
+    kind: guarantee
+    text: "Totality: with a tool call, exactly one of use_untrusted/use_trusted/audit/shutdown; without one, pass_through only."
+    spectra:
+      - "G (tool_call -> ((use_untrusted | use_trusted | audit | shutdown) & !pass_through))"
+      - "G (!tool_call -> (pass_through & !use_untrusted & !use_trusted & !audit & !shutdown))"
+      - "G (!(use_untrusted & use_trusted) & !(use_untrusted & audit) & !(use_untrusted & shutdown) & !(use_trusted & audit) & !(use_trusted & shutdown) & !(audit & shutdown))"
+  - id: G1
+    kind: guarantee
+    text: "[paper] Shut down when the untrusted model is significantly more suspicious than expected."
+    spectra: "G (excess_suspicion -> shutdown)"
+  - id: G2
+    kind: guarantee
+    text: "[paper] Audit proposals in the top 2% most suspicious."
+    spectra: "G ((tool_call & above_audit) -> audit)"
+  - id: G3
+    kind: guarantee
+    text: "[paper] Auditing consumes a finite human budget; nothing is audited once it is spent."
+    spectra: "G (budget_exhausted -> !audit)"
+  - id: G4
+    kind: guarantee
+    text: "[routing] Above the deferral threshold the untrusted action is never executed."
+    spectra: "G (above_defer -> !use_untrusted)"
+  - id: A1
+    kind: assumption
+    text: "Domain: a top-2% proposal is above the deferral threshold; excess suspicion only arises on a tool call."
+    spectra:
+      - "G (above_audit -> above_defer)"
+      - "G (excess_suspicion -> tool_call)"

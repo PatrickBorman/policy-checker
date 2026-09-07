@@ -1,0 +1,2 @@
+Filename,NumRepairs,RepairLimit,TimeToFirst,Runtime,Timeout,TimedOut,NodesExplored,DuplicateNodes,NumInterpolantsComputed,NumNonStateSeparable
+/Users/patrickborman/Documents/policy-checker/out_sc/sc4_um_honeypot.manual.spectra,1,1,0.4431528,0.443790989,120.0,False,3,0,2,0

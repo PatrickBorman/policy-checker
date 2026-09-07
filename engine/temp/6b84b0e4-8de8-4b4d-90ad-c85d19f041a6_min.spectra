@@ -1,0 +1,25 @@
+module sc2_te_audit
+
+env boolean tool_call;
+env boolean above_audit;
+env boolean above_edit;
+env boolean budget_exhausted;
+sys boolean use_untrusted;
+sys boolean use_edited;
+sys boolean audit;
+sys boolean pass_through;
+
+// L0
+// L0
+// L0
+// G1
+// G2
+// G3
+// G4
+// A1
+assumption
+	G (above_audit -> above_edit);
+guarantee
+	G((tool_call&above_audit)->audit);
+guarantee
+	G(budget_exhausted->!audit);

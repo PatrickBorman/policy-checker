@@ -1,0 +1,88 @@
+[
+  {
+    "policy_set": "sc1_dtt_audit_shutdown",
+    "source": "policies_safetycase/sc1_dtt_audit_shutdown.yaml",
+    "mode": "manual",
+    "rules": 6,
+    "t_translate_s": 0.0,
+    "spectra": "out_sc/sc1_dtt_audit_shutdown.manual.spectra",
+    "realizable": false,
+    "t_check_s": 1.41,
+    "y_sat": true,
+    "core_rules": [
+      "G2",
+      "G3"
+    ],
+    "counter_trace": "step 0:  environment: tool_call, above_defer, above_audit, excess_suspicion    [not: budget_exhausted]\n         controller:  no response satisfies every rule:\n             (nothing)    [not: audit]                violates L0, G1, G2\n             audit                                    violates G1",
+    "repairs": [
+      "G(!(above_audit & tool_call & budget_exhausted))",
+      "G(!(excess_suspicion & tool_call & above_audit))"
+    ],
+    "t_repair_s": 3.48,
+    "repair_nodes": 5
+  },
+  {
+    "policy_set": "sc2_te_audit",
+    "source": "policies_safetycase/sc2_te_audit.yaml",
+    "mode": "manual",
+    "rules": 6,
+    "t_translate_s": 0.0,
+    "spectra": "out_sc/sc2_te_audit.manual.spectra",
+    "realizable": false,
+    "t_check_s": 1.64,
+    "y_sat": true,
+    "core_rules": [
+      "G1",
+      "G4"
+    ],
+    "counter_trace": "step 0:  environment: tool_call, above_audit, above_edit, budget_exhausted\n         controller:  no response satisfies every rule:\n             (nothing)    [not: audit]                violates L0, G1\n             audit                                    violates G4",
+    "repairs": [
+      "G(!(budget_exhausted & tool_call & above_audit))"
+    ],
+    "t_repair_s": 2.49,
+    "repair_nodes": 2
+  },
+  {
+    "policy_set": "sc3_dtr_audit",
+    "source": "policies_safetycase/sc3_dtr_audit.yaml",
+    "mode": "manual",
+    "rules": 7,
+    "t_translate_s": 0.0,
+    "spectra": "out_sc/sc3_dtr_audit.manual.spectra",
+    "realizable": false,
+    "t_check_s": 1.56,
+    "y_sat": true,
+    "core_rules": [
+      "G4",
+      "G5"
+    ],
+    "counter_trace": "step 0:  environment: tool_call, initial_above_defer, min_resample_above_defer, min_above_audit    [not: budget_exhausted]\n         controller:  no response satisfies every rule:\n             (nothing)    [not: audit]                violates L0, G2, G4\n             audit                                    violates G2",
+    "repairs": [
+      "G(!(budget_exhausted & tool_call & min_above_audit))",
+      "G(!(tool_call & min_above_audit & min_resample_above_defer & initial_above_defer))"
+    ],
+    "t_repair_s": 3.12,
+    "repair_nodes": 4
+  },
+  {
+    "policy_set": "sc4_um_honeypot",
+    "source": "policies_safetycase/sc4_um_honeypot.yaml",
+    "mode": "manual",
+    "rules": 6,
+    "t_translate_s": 0.0,
+    "spectra": "out_sc/sc4_um_honeypot.manual.spectra",
+    "realizable": false,
+    "t_check_s": 1.57,
+    "y_sat": true,
+    "core_rules": [
+      "G4",
+      "G5"
+    ],
+    "counter_trace": "step 0:  environment: output_ready, monitor_flagged, budget_exhausted    [not: honeypot]\n         controller:  no response satisfies every rule:\n             (nothing)    [not: audit]                violates L0, G4\n             audit                                    violates G5",
+    "repairs": [
+      "G(!(budget_exhausted & output_ready & monitor_flagged))"
+    ],
+    "t_repair_s": 2.49,
+    "repair_nodes": 3
+  }
+]

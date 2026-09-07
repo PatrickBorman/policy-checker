@@ -1,0 +1,44 @@
+name: sc4_um_honeypot
+description: >
+  Untrusted monitoring with honeypots (Greenblatt et al.), online: never ship a honeypot; if the untrusted
+  monitor fails to flag a honeypot, shut down; audit flagged proposals under a finite budget.
+provenance: >
+  Greenblatt et al. 2023 untrusted monitoring ("audit the top 1.4% most suspicious"; honeypot construction "if
+  the false negative rate is too high, shut down"). Online enforcement of ship/audit/shutdown with a budget.
+env:
+  - {name: output_ready, desc: an output awaits routing}
+  - {name: honeypot, desc: this output is a synthetic honeypot (known malicious)}
+  - {name: monitor_flagged, desc: the untrusted monitor flagged it}
+  - {name: budget_exhausted, desc: the audit budget is spent}
+sys:
+  - {name: ship, desc: ship the output}
+  - {name: audit, desc: route to a human auditor}
+  - {name: shutdown, desc: halt and replace the monitor}
+rules:
+  - id: L0
+    kind: guarantee
+    text: "Totality: exactly one of ship/audit/shutdown on an output; nothing otherwise."
+    spectra:
+      - "G (output_ready -> (ship | audit | shutdown))"
+      - "G (!output_ready -> (!ship & !audit & !shutdown))"
+      - "G (!(ship & audit) & !(ship & shutdown) & !(audit & shutdown))"
+  - id: G1
+    kind: guarantee
+    text: "[paper] Never ship a honeypot."
+    spectra: "G ((output_ready & honeypot) -> !ship)"
+  - id: G2
+    kind: guarantee
+    text: "[paper] If the monitor fails to flag a honeypot, shut down."
+    spectra: "G ((output_ready & honeypot & !monitor_flagged) -> shutdown)"
+  - id: G3
+    kind: guarantee
+    text: "[paper] Shut down only on a missed honeypot."
+    spectra: "G (shutdown -> (output_ready & honeypot & !monitor_flagged))"
+  - id: G4
+    kind: guarantee
+    text: "[paper] Flagged outputs are audited."
+    spectra: "G ((output_ready & monitor_flagged) -> audit)"
+  - id: G5
+    kind: guarantee
+    text: "[budget] Nothing is audited once the budget is spent."
+    spectra: "G (budget_exhausted -> !audit)"

@@ -1,0 +1,9 @@
+Found 1 unrealizable core system variables.
+At line 8 variable audit.
+
+Initial Dead State Sf0 <output_ready:true, honeypot:false, monitor_flagged:true, budget_exhausted:true, audit:false>
+	With successors : Sf2
+Initial Dead State Sf1 <output_ready:true, honeypot:false, monitor_flagged:true, budget_exhausted:true, audit:true>
+	With successors : Sf2
+Dead State Sf2 <output_ready:false, honeypot:false, monitor_flagged:false, budget_exhausted:false>
+	With no successors.

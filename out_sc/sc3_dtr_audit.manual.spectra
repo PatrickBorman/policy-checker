@@ -1,0 +1,40 @@
+module sc3_dtr_audit
+
+env boolean tool_call;
+env boolean initial_above_defer;
+env boolean min_resample_above_defer;
+env boolean min_above_audit;
+env boolean budget_exhausted;
+sys boolean use_initial;
+sys boolean use_least_sus_resample;
+sys boolean use_trusted;
+sys boolean audit;
+sys boolean pass_through;
+
+// L0
+guarantee
+	G (tool_call -> ((use_initial | use_least_sus_resample | use_trusted | audit) & !pass_through));
+// L0
+guarantee
+	G (!tool_call -> (pass_through & !use_initial & !use_least_sus_resample & !use_trusted & !audit));
+// L0
+guarantee
+	G (!(use_initial & use_least_sus_resample) & !(use_initial & use_trusted) & !(use_initial & audit) & !(use_least_sus_resample & use_trusted) & !(use_least_sus_resample & audit) & !(use_trusted & audit));
+// G1
+guarantee
+	G ((tool_call & !initial_above_defer) -> use_initial);
+// G2
+guarantee
+	G ((tool_call & initial_above_defer & min_resample_above_defer) -> use_trusted);
+// G3
+guarantee
+	G ((tool_call & initial_above_defer & !min_resample_above_defer) -> use_least_sus_resample);
+// G4
+guarantee
+	G ((tool_call & min_above_audit) -> audit);
+// G5
+guarantee
+	G (budget_exhausted -> !audit);
+// A1
+assumption
+	G (min_above_audit -> (initial_above_defer & min_resample_above_defer));

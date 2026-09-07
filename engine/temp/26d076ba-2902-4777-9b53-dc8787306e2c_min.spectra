@@ -1,0 +1,25 @@
+module sc4_um_honeypot
+
+env boolean output_ready;
+env boolean honeypot;
+env boolean monitor_flagged;
+env boolean budget_exhausted;
+sys boolean ship;
+sys boolean audit;
+sys boolean shutdown;
+
+// L0
+// L0
+// L0
+// G1
+// G2
+// G3
+// G4
+// G5
+
+assumption
+	!(budget_exhausted & output_ready & monitor_flagged);
+guarantee
+	G(budget_exhausted->!audit);
+guarantee
+	G((output_ready&monitor_flagged)->audit);
