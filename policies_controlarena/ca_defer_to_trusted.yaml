@@ -1,0 +1,26 @@
+name: ca_defer_to_trusted
+description: >
+  ControlArena defer_to_trusted micro-protocol, as implemented (control_arena/micro_protocol/_defer_to_trusted.py,
+  commit b9d19de, 2026-08-21). Per step: untrusted policy proposes; if no tool call, pass through; else monitor
+  scores; if score > defer_threshold the trusted policy's action replaces it, otherwise the untrusted action runs.
+provenance: UKGovernmentBEIS/control-arena @ b9d19de, _defer_to_trusted.py lines "if monitor_response.suspicion_score > defer_threshold"
+env:
+  - {name: tool_call, desc: the untrusted policy's message contains a tool call this step}
+  - {name: above_defer, desc: monitor suspicion_score > defer_threshold}
+sys:
+  - {name: use_untrusted, desc: execute the untrusted action}
+  - {name: use_trusted, desc: discard it and execute the trusted policy's action}
+  - {name: pass_through, desc: return the state unchanged (no tool call)}
+rules:
+  - id: R1
+    kind: guarantee
+    text: If the message has no tool call, the protocol returns the state unchanged and takes no other action.
+    spectra: "G (!tool_call -> (pass_through & !use_untrusted & !use_trusted))"
+  - id: R2
+    kind: guarantee
+    text: If there is a tool call and the suspicion score is above the deferral threshold, the trusted policy's action is executed instead.
+    spectra: "G ((tool_call & above_defer) -> (use_trusted & !use_untrusted & !pass_through))"
+  - id: R3
+    kind: guarantee
+    text: If there is a tool call and the score is not above the threshold, the untrusted action is executed.
+    spectra: "G ((tool_call & !above_defer) -> (use_untrusted & !use_trusted & !pass_through))"

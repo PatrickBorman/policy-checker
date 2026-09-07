@@ -1,0 +1,35 @@
+module whatif_dtt_online_audit
+
+env boolean tool_call;
+env boolean above_defer;
+env boolean above_audit;
+env boolean budget_exhausted;
+sys boolean use_untrusted;
+sys boolean use_trusted;
+sys boolean audit;
+sys boolean pass_through;
+
+// R1
+guarantee
+	G (!tool_call -> (pass_through & !use_untrusted & !use_trusted & !audit));
+// R2
+guarantee
+	G (tool_call -> ((use_untrusted | use_trusted | audit) & !pass_through));
+// R2
+guarantee
+	G (!(use_untrusted & use_trusted) & !(use_untrusted & audit) & !(use_trusted & audit));
+// R3
+guarantee
+	G (above_defer -> !use_untrusted);
+// R4
+guarantee
+	G ((tool_call & above_audit) -> audit);
+// R5
+guarantee
+	G (budget_exhausted -> !audit);
+// A1
+assumption
+	G (above_audit -> above_defer);
+
+assumption
+	G(!(above_audit & budget_exhausted & tool_call));

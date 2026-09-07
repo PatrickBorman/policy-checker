@@ -1,0 +1,22 @@
+module ca_defer_to_resample
+
+env boolean tool_call;
+env boolean initial_above_defer;
+env boolean min_resample_above_defer;
+sys boolean use_initial;
+sys boolean use_least_sus_resample;
+sys boolean use_trusted;
+sys boolean pass_through;
+
+// R1
+guarantee
+	G (!tool_call -> pass_through);
+// R2
+guarantee
+	G ((tool_call & !initial_above_defer) -> use_initial);
+// R3
+guarantee
+	G ((tool_call & initial_above_defer & min_resample_above_defer) -> use_trusted);
+// R4
+guarantee
+	G ((tool_call & initial_above_defer & !min_resample_above_defer) -> use_least_sus_resample);

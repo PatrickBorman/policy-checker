@@ -1,0 +1,23 @@
+[
+  {
+    "policy_set": "whatif_dtt_online_audit",
+    "source": "policies_controlarena/whatif_dtt_online_audit.yaml",
+    "mode": "manual",
+    "rules": 6,
+    "t_translate_s": 0.0,
+    "spectra": "out_ca/whatif_dtt_online_audit.manual.spectra",
+    "realizable": false,
+    "t_check_s": 1.21,
+    "y_sat": true,
+    "core_rules": [
+      "R4",
+      "R5"
+    ],
+    "counter_trace": "step 0:  environment: tool_call, above_defer, above_audit, budget_exhausted\n         controller:  no response satisfies every rule:\n             (nothing)    [not: audit]                violates R4\n             audit                                    violates R5",
+    "repairs": [
+      "G(!(above_audit & budget_exhausted & tool_call))"
+    ],
+    "t_repair_s": 2.81,
+    "repair_nodes": 3
+  }
+]

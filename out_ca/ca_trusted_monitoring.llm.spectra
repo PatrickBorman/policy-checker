@@ -1,0 +1,12 @@
+module ca_trusted_monitoring
+
+env boolean tool_call;
+sys boolean run_monitor;
+sys boolean execute;
+
+// R1
+guarantee
+	G (tool_call <-> run_monitor);
+// R2
+guarantee
+	G (execute);

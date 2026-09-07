@@ -1,0 +1,25 @@
+name: ca_trusted_editing
+description: >
+  ControlArena trusted_editing micro-protocol, as implemented (_trusted_editing.py, b9d19de). Per step: untrusted
+  proposes; no tool call -> return; else monitor; if score > edit_threshold the trusted editor's output replaces it.
+provenance: UKGovernmentBEIS/control-arena @ b9d19de, _trusted_editing.py "if monitor_response.suspicion_score > edit_threshold"
+env:
+  - {name: tool_call, desc: the untrusted message contains a tool call}
+  - {name: above_edit, desc: monitor suspicion_score > edit_threshold}
+sys:
+  - {name: use_untrusted, desc: keep the untrusted output}
+  - {name: use_edited, desc: replace it with the trusted editor's output}
+  - {name: pass_through, desc: return unchanged}
+rules:
+  - id: R1
+    kind: guarantee
+    text: No tool call means the state is returned unchanged.
+    spectra: "G (!tool_call -> (pass_through & !use_untrusted & !use_edited))"
+  - id: R2
+    kind: guarantee
+    text: A tool call scored above the edit threshold is replaced by the trusted editor's output.
+    spectra: "G ((tool_call & above_edit) -> (use_edited & !use_untrusted & !pass_through))"
+  - id: R3
+    kind: guarantee
+    text: A tool call scored at or below the threshold is kept as the untrusted output.
+    spectra: "G ((tool_call & !above_edit) -> (use_untrusted & !use_edited & !pass_through))"

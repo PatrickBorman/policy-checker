@@ -1,0 +1,62 @@
+Using BDD Package: CUDDFactory, Version: CUDD 3.0
+Using BDD Package: CUDDFactory, Version: CUDD 3.0
+
+
+=== ARGS ===
+ALL GARS: False
+MINIMIZE SPEC: True
+USE INFLUENTIAL: True
+TIMEOUT: 120.0
+REPAIR LIMIT: 1
+
+
+++++ ELAPSED TIME: 2.825999999789275e-06
+++++ QUEUE LENGTH: 0
+++++ Solutions: 0
+++++ Duplicates: 0
+++++ Node number: 1
+++++ Refinement: []
+++++ Length: 0
+++ Y-SAT CHECK
+++ REALIZABILITY CHECK
+++ COUNTERSTRATEGY COMPUTATION - REFINEMENT GENERATION
+
+=== COUNTERRUN ===
+Sf1 -> Sf2
+
+
+=== INTERPOLANT ===
+(above_audit__Sf1 & budget_exhausted__Sf1 & tool_call__Sf1)
+
+
+++++ ELAPSED TIME: 0.19712219799999975
+++++ QUEUE LENGTH: 1
+++++ Solutions: 0
+++++ Duplicates: 0
+++++ Node number: 2
+++++ Refinement: ['!(above_audit & budget_exhausted & tool_call)']
+++++ Length: 1
+++ Y-SAT CHECK
+++ REALIZABILITY CHECK
+++ COUNTERSTRATEGY COMPUTATION - REFINEMENT GENERATION
+
+=== COUNTERRUN ===
+S0 -> Sf3 -> Sf4
+
+
+=== INTERPOLANT ===
+(above_audit__Sf3 & budget_exhausted__Sf3 & tool_call__Sf3)
+
+
+++++ ELAPSED TIME: 0.38965162399999986
+++++ QUEUE LENGTH: 1
+++++ Solutions: 0
+++++ Duplicates: 0
+++++ Node number: 3
+++++ Refinement: ['G(!(above_audit & budget_exhausted & tool_call))']
+++++ Length: 1
+++ Y-SAT CHECK
+++ REALIZABILITY CHECK
+++ REALIZABLE REFINEMENT: SAT CHECK
+
+++++ SAVING SEARCH SUMMARY DATA

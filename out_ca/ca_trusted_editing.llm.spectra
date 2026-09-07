@@ -1,0 +1,26 @@
+module ca_trusted_editing
+
+env boolean tool_call;
+env boolean above_edit;
+sys boolean use_untrusted;
+sys boolean use_edited;
+sys boolean pass_through;
+
+// R1
+guarantee
+	G (!tool_call -> pass_through);
+// R1
+guarantee
+	G (!tool_call -> (!use_untrusted & !use_edited));
+// R2
+guarantee
+	G ((tool_call & above_edit) -> use_edited);
+// R2
+guarantee
+	G ((tool_call & above_edit) -> (!use_untrusted & !pass_through));
+// R3
+guarantee
+	G ((tool_call & !above_edit) -> use_untrusted);
+// R3
+guarantee
+	G ((tool_call & !above_edit) -> (!use_edited & !pass_through));

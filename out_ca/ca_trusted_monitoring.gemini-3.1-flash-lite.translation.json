@@ -1,0 +1,22 @@
+{
+  "rules": [
+    {
+      "id": "R1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (tool_call <-> run_monitor)"
+      ],
+      "note": "The monitor runs if and only if a tool call is present.",
+      "approximate": false
+    },
+    {
+      "id": "R2",
+      "kind": "guarantee",
+      "spectra": [
+        "G (execute)"
+      ],
+      "note": "The action is always allowed to proceed.",
+      "approximate": false
+    }
+  ]
+}

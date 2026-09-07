@@ -1,0 +1,34 @@
+{
+  "rules": [
+    {
+      "id": "R1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (!tool_call -> pass_through)",
+        "G (!tool_call -> (!use_untrusted & !use_edited))"
+      ],
+      "note": "If no tool call, the system must pass through and not use untrusted or edited outputs.",
+      "approximate": false
+    },
+    {
+      "id": "R2",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((tool_call & above_edit) -> use_edited)",
+        "G ((tool_call & above_edit) -> (!use_untrusted & !pass_through))"
+      ],
+      "note": "If tool call and above threshold, must use edited output and not use untrusted or pass through.",
+      "approximate": false
+    },
+    {
+      "id": "R3",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((tool_call & !above_edit) -> use_untrusted)",
+        "G ((tool_call & !above_edit) -> (!use_edited & !pass_through))"
+      ],
+      "note": "If tool call and at or below threshold, must use untrusted output and not use edited or pass through.",
+      "approximate": false
+    }
+  ]
+}

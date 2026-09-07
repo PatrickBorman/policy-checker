@@ -1,0 +1,43 @@
+name: whatif_dtt_online_audit
+description: >
+  WHAT-IF, not ControlArena code: the defer_to_trusted micro-protocol plus the paper's auditing rule brought online -
+  "audit the top 2% most suspicious proposals" under a finite audit budget (ControlArena computes this post-hoc from
+  logged scores). Written as the paper states it, without inventing a fallback for an exhausted budget.
+provenance: hypothetical extension of ca_defer_to_trusted with Greenblatt et al. 2023 "audit the top 2% most suspicious" + finite audit budget
+env:
+  - {name: tool_call, desc: the untrusted message contains a tool call}
+  - {name: above_defer, desc: suspicion_score > defer_threshold}
+  - {name: above_audit, desc: suspicion_score in the top 2% (above the audit threshold)}
+  - {name: budget_exhausted, desc: the audit budget is spent}
+sys:
+  - {name: use_untrusted, desc: execute the untrusted action}
+  - {name: use_trusted, desc: execute the trusted policy's action}
+  - {name: audit, desc: send the step to a human auditor}
+  - {name: pass_through, desc: return unchanged}
+rules:
+  - id: R1
+    kind: guarantee
+    text: No tool call means the state is returned unchanged.
+    spectra: "G (!tool_call -> (pass_through & !use_untrusted & !use_trusted & !audit))"
+  - id: R2
+    kind: guarantee
+    text: A tool call is handled by exactly one of use_untrusted, use_trusted or audit.
+    spectra:
+      - "G (tool_call -> ((use_untrusted | use_trusted | audit) & !pass_through))"
+      - "G (!(use_untrusted & use_trusted) & !(use_untrusted & audit) & !(use_trusted & audit))"
+  - id: R3
+    kind: guarantee
+    text: Above the deferral threshold the untrusted action is never executed.
+    spectra: "G (above_defer -> !use_untrusted)"
+  - id: R4
+    kind: guarantee
+    text: Proposals in the top 2% most suspicious are audited.
+    spectra: "G ((tool_call & above_audit) -> audit)"
+  - id: R5
+    kind: guarantee
+    text: Nothing is audited once the budget is exhausted.
+    spectra: "G (budget_exhausted -> !audit)"
+  - id: A1
+    kind: assumption
+    text: The audit threshold is at least the deferral threshold - a top-2% proposal is above the deferral threshold.
+    spectra: "G (above_audit -> above_defer)"

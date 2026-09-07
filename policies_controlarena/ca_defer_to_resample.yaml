@@ -1,0 +1,33 @@
+name: ca_defer_to_resample
+description: >
+  ControlArena defer_to_resample micro-protocol, as implemented (_defer_to_resample.py, b9d19de). Per step: initial
+  untrusted sample scored; if score <= defer_threshold use it; else draw resample_steps (+extra) samples; if the
+  least suspicious primary resample is still > defer_threshold, execute the trusted policy's action; otherwise
+  execute the least suspicious resample. Extra samples are logged, not used in the decision.
+provenance: UKGovernmentBEIS/control-arena @ b9d19de, _defer_to_resample.py impl()
+env:
+  - {name: tool_call, desc: the initial untrusted message contains a tool call}
+  - {name: initial_above_defer, desc: initial suspicion_score > defer_threshold}
+  - {name: min_resample_above_defer, desc: the least suspicious primary resample is > defer_threshold}
+sys:
+  - {name: use_initial, desc: execute the initial untrusted action}
+  - {name: use_least_sus_resample, desc: execute the least suspicious resample}
+  - {name: use_trusted, desc: execute the trusted policy's action}
+  - {name: pass_through, desc: return unchanged}
+rules:
+  - id: R1
+    kind: guarantee
+    text: No tool call means the state is returned unchanged.
+    spectra: "G (!tool_call -> (pass_through & !use_initial & !use_least_sus_resample & !use_trusted))"
+  - id: R2
+    kind: guarantee
+    text: If the initial score is at or below the deferral threshold, the initial action is executed.
+    spectra: "G ((tool_call & !initial_above_defer) -> (use_initial & !use_least_sus_resample & !use_trusted & !pass_through))"
+  - id: R3
+    kind: guarantee
+    text: If the initial score is above the threshold and the least suspicious resample is also above it, the trusted policy's action is executed.
+    spectra: "G ((tool_call & initial_above_defer & min_resample_above_defer) -> (use_trusted & !use_initial & !use_least_sus_resample & !pass_through))"
+  - id: R4
+    kind: guarantee
+    text: If the initial score is above the threshold and some resample is at or below it, the least suspicious resample is executed.
+    spectra: "G ((tool_call & initial_above_defer & !min_resample_above_defer) -> (use_least_sus_resample & !use_initial & !use_trusted & !pass_through))"

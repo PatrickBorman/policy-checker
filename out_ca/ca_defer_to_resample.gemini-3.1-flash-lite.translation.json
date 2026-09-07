@@ -1,0 +1,40 @@
+{
+  "rules": [
+    {
+      "id": "R1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (!tool_call -> pass_through)"
+      ],
+      "note": "If no tool call is present, the system must pass through the input unchanged.",
+      "approximate": false
+    },
+    {
+      "id": "R2",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((tool_call & !initial_above_defer) -> use_initial)"
+      ],
+      "note": "If initial score is below or equal to threshold, use initial action.",
+      "approximate": false
+    },
+    {
+      "id": "R3",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((tool_call & initial_above_defer & min_resample_above_defer) -> use_trusted)"
+      ],
+      "note": "If initial and resample scores are above threshold, use trusted policy.",
+      "approximate": false
+    },
+    {
+      "id": "R4",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((tool_call & initial_above_defer & !min_resample_above_defer) -> use_least_sus_resample)"
+      ],
+      "note": "If initial is above threshold but resample is below or equal, use resample.",
+      "approximate": false
+    }
+  ]
+}

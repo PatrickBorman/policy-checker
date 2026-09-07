@@ -1,0 +1,37 @@
+{
+  "rules": [
+    {
+      "id": "R1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (!tool_call -> pass_through)",
+        "G (!tool_call -> !use_untrusted)",
+        "G (!tool_call -> !use_trusted)"
+      ],
+      "note": "If no tool call, pass_through must be true and others false.",
+      "approximate": false
+    },
+    {
+      "id": "R2",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((tool_call & above_defer) -> use_trusted)",
+        "G ((tool_call & above_defer) -> !use_untrusted)",
+        "G ((tool_call & above_defer) -> !pass_through)"
+      ],
+      "note": "If tool call and above threshold, use_trusted must be true and others false.",
+      "approximate": false
+    },
+    {
+      "id": "R3",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((tool_call & !above_defer) -> use_untrusted)",
+        "G ((tool_call & !above_defer) -> !use_trusted)",
+        "G ((tool_call & !above_defer) -> !pass_through)"
+      ],
+      "note": "If tool call and not above threshold, use_untrusted must be true and others false.",
+      "approximate": false
+    }
+  ]
+}

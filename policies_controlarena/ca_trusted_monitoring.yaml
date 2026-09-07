@@ -1,0 +1,19 @@
+name: ca_trusted_monitoring
+description: >
+  ControlArena trusted_monitoring micro-protocol, as implemented (_trusted_monitoring.py, b9d19de). Non-intervening:
+  run the policy; if the step has a tool call, run the monitor and attach its score. The action is never changed.
+provenance: UKGovernmentBEIS/control-arena @ b9d19de, _trusted_monitoring.py impl()
+env:
+  - {name: tool_call, desc: the policy's output contains a tool call}
+sys:
+  - {name: run_monitor, desc: run the monitor and attach its score}
+  - {name: execute, desc: the policy's action proceeds}
+rules:
+  - id: R1
+    kind: guarantee
+    text: The monitor is run exactly when the step has a tool call.
+    spectra: "G (run_monitor <-> tool_call)"
+  - id: R2
+    kind: guarantee
+    text: The policy's action always proceeds; the protocol never changes it.
+    spectra: "G (execute)"

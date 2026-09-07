@@ -1,0 +1,17 @@
+module ca_defer_to_trusted
+
+env boolean tool_call;
+env boolean above_defer;
+sys boolean use_untrusted;
+sys boolean use_trusted;
+sys boolean pass_through;
+
+// R1
+guarantee
+	G (!tool_call -> (pass_through & !use_untrusted & !use_trusted));
+// R2
+guarantee
+	G ((tool_call & above_defer) -> (use_trusted & !use_untrusted & !pass_through));
+// R3
+guarantee
+	G ((tool_call & !above_defer) -> (use_untrusted & !use_trusted & !pass_through));
