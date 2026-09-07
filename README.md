@@ -68,15 +68,23 @@ free tier is enough - default model `gemini-3.5-flash`), or `GOOGLE_CLOUD_PROJEC
 login` (Claude on Vertex AI). Force one with `POLICY_CHECKER_PROVIDER=anthropic|gemini|vertex`.
 Keep keys in `~/.config/policy-checker/env` and `source` it.
 
-## Requirements
+## Requirements and setup
 
-- JDK 22 (`/usr/local/Cellar/openjdk/22.0.2`), Spectra jars in `~/Documents/interpolation-repair/interpolation-repair/spectra`,
-  and `libcudd.dylib` in `~/amba-fix` (built from `spectra-src-code/spectra-cudd` for macOS x86-64; without it
-  Spectra falls back to a pure-Java BDD engine ~50× slower and the core/counter-strategy calls fail).
-  Override paths with `POLICY_CHECKER_JAVA`, `POLICY_CHECKER_SPECTRA_DIR`, `POLICY_CHECKER_CUDD_DIR`.
-- Python 3.12 with `anthropic`, `pydantic`, `pyyaml`.
-- Build the shim once:
-  `javac -cp "$SPECTRA/SpectraTool.jar:$SPECTRA/dependencies/*" -d java/out java/SpecCheck.java`
+Everything the pipeline needs is in the repo: Spectra's `SpectraTool.jar` and dependencies (BSD-3, Tel Aviv
+University; `vendor/spectra/LICENSE.spectra`), CUDD as `libcudd.dylib` (macOS x86-64) and `libcudd.so` (Linux
+x86-64), and the assumption-refinement engine (`engine/`, from the MSc thesis) with a Python stand-in for its
+MathSAT 4 interpolator.
+
+```
+conda env create -f environment.yml && conda activate policy-checker   # python, JDK, jpype, dd, ...
+./setup.sh                                                              # compiles the 40-line Java shim
+python -m policy_checker check policies/email_agent.yaml --no-llm --repair
+```
+Without conda: any JDK >= 17 on PATH (or `JAVA_HOME`) plus `pip install jpype1 dd tarjan numpy pyparsing pyyaml
+pydantic anthropic google-genai`. Apple-silicon Macs need a native `libcudd.dylib` (build from Spectra's
+`spectra-cudd` with `mac_build.sh`); the pure-Java BDD fallback is ~50x slower and cannot compute cores.
+Path overrides: `POLICY_CHECKER_JAVA`, `POLICY_CHECKER_SPECTRA_DIR`, `POLICY_CHECKER_CUDD_DIR`,
+`POLICY_CHECKER_ENGINE_DIR`, `POLICY_CHECKER_PYTHON` (interpreter for the engine).
 
 ## Spectra subset
 
