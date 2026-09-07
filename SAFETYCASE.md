@@ -36,7 +36,7 @@ I composed its ControlArena routing with the online obligation its source paper 
 |---|---|---|---|
 | `sc1` defer_to_trusted + audit-top-2% + shutdown-on-excess-suspicion | **no** | audit vs budget; audit vs shutdown | a top-2% proposal after the budget is spent; a proposal that is both top-2% and excess-suspicion |
 | `sc2` trusted_editing + audit-top-2% (three-tier) | **no** | audit vs budget | a top-2% proposal after the budget is spent |
-| `sc3` defer_to_resample + audit-if-min-above-threshold | **no** | audit vs budget | all samples above the audit threshold, budget spent |
+| `sc3` defer_to_resample + audit-if-min-above-threshold | **no** | audit vs use-trusted (ordering, no budget needed); audit vs budget | all samples above the audit threshold |
 | `sc4` untrusted_monitoring + honeypot-shutdown + audit | **no** | audit vs budget | a flagged output after the budget is spent |
 
 Each is checked in ~2 s; each counter-trace is one step; the repair engine returns the missing assumption in
@@ -59,6 +59,19 @@ sc2:  add   assumption G(!(above_audit & tool_call & budget_exhausted))
 
 sc1 carries a second, independent gap: a proposal that is simultaneously top-2%-suspicious and triggers the
 excess-suspicion shutdown must both be audited and shut down, and the paper does not order the two.
+
+## Cross-validation (independent of Spectra)
+
+Every result above was re-derived by a second method that shares no code with the checker: each protocol's
+sentences written as literal `(guard -> required / forbidden action)` clauses in plain Python, brute-forced over
+all environments, flagging states where no action is legal (deadlock) or two clauses require incompatible actions
+(conflict). It is in `crosscheck/literal_clauses.py`; run it directly. It reproduces all four verdicts and the
+exact deadlock states, so the finding is a property of the rules, not of the GR(1) encoding.
+
+The cross-check also sharpens one case. **defer_to_resample has an ordering conflict with no added obligation at
+all:** Ctrl-Z states "if all samples are above the deferral threshold, implement the trusted action" and "if the
+minimum of all samples is above the auditing threshold, audit the most suspicious sample." When both hold, both
+are required, and the paper never orders them. This is latent in the protocol as written, before any budget.
 
 ## What this is
 
