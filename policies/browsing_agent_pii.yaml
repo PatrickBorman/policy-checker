@@ -1,0 +1,33 @@
+name: browsing_agent_pii
+description: >
+  A browsing agent that may submit data to external sites; controls on personal data leaving the tenant.
+provenance: modelled on browser-agent data-loss-prevention guardrails
+env:
+  - {name: req_submit, desc: the agent wants to submit a form or request}
+  - {name: external, desc: the destination is outside the organisation}
+  - {name: contains_pii, desc: the payload contains personal data}
+  - {name: user_present, desc: a user is present to answer a prompt}
+sys:
+  - {name: allow, desc: the submission proceeds}
+  - {name: block, desc: the submission is dropped}
+  - {name: ask, desc: the user is asked to confirm}
+rules:
+  - id: G1
+    kind: guarantee
+    text: Each submission gets exactly one of allow, block or ask in the same step; nothing without a request.
+    spectra:
+      - "G (req_submit -> (allow | block | ask))"
+      - "G (!(allow & block) & !(allow & ask) & !(block & ask))"
+      - "G (!req_submit -> (!allow & !block & !ask))"
+  - id: G2
+    kind: guarantee
+    text: Personal data never goes to an external destination without asking the user first.
+    spectra: "G ((req_submit & external & contains_pii) -> !allow)"
+  - id: G3
+    kind: guarantee
+    text: Never ask when no user is present.
+    spectra: "G (!user_present -> !ask)"
+  - id: G4
+    kind: guarantee
+    text: Internal submissions without personal data are allowed without asking.
+    spectra: "G ((req_submit & !external & !contains_pii) -> allow)"

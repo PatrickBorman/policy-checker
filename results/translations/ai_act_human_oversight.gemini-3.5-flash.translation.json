@@ -1,0 +1,50 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (decision_ready -> ((act_auto | defer_human | halt) & !(act_auto & defer_human) & !(act_auto & halt) & !(defer_human & halt)))",
+        "G (!decision_ready -> (!act_auto & !defer_human & !halt))"
+      ],
+      "note": "When decision is ready, exactly one action is chosen; otherwise, no action is taken.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G (anomaly -> !act_auto)"
+      ],
+      "note": "Anomalies prevent automatic action in the same step.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G (override -> !act_auto)"
+      ],
+      "note": "Override requests prevent automatic action in the same step.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G (defer_human -> human_available)"
+      ],
+      "note": "Deferring to a human requires a human to be available.",
+      "approximate": false
+    },
+    {
+      "id": "G5",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((decision_ready & !anomaly & !override) -> act_auto)"
+      ],
+      "note": "When a decision is ready, the system acts automatically if there is no anomaly and no override.",
+      "approximate": true
+    }
+  ]
+}

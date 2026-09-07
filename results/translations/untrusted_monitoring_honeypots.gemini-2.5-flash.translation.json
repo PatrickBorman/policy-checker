@@ -1,0 +1,52 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (output_ready -> (ship | audit))",
+        "G (!(ship & audit))",
+        "G (!output_ready -> (!ship & !audit))"
+      ],
+      "note": "Every output is either shipped or audited, never both, and only when an output is ready.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G (honeypot -> !ship)"
+      ],
+      "note": "Honeypots are never shipped.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((honeypot & !monitor_flagged) -> shutdown)"
+      ],
+      "note": "If a honeypot is not flagged, the system shuts down in the same step.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G (shutdown -> (honeypot & !monitor_flagged))"
+      ],
+      "note": "Shutdown only occurs if a honeypot was missed.",
+      "approximate": false
+    },
+    {
+      "id": "G5",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((output_ready & monitor_flagged & !budget_exhausted) -> audit)",
+        "G (budget_exhausted -> !audit)"
+      ],
+      "note": "Flagged outputs are audited if budget allows; nothing is audited if budget is exhausted.",
+      "approximate": false
+    }
+  ]
+}

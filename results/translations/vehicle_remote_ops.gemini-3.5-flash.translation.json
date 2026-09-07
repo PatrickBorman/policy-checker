@@ -1,0 +1,41 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (proceed | stop | return_home)",
+        "G (!(proceed & stop) & !(proceed & return_home) & !(stop & return_home))"
+      ],
+      "note": "Exactly one of proceed, stop, or return_home must be true in every step.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G (obstacle -> !proceed)"
+      ],
+      "note": "If an obstacle is detected, proceed must be false.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G (operator_stop -> stop)"
+      ],
+      "note": "If operator_stop is true, stop must be true in the same step.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G (low_battery -> return_home)"
+      ],
+      "note": "If low_battery is true, return_home must be true in the same step.",
+      "approximate": false
+    }
+  ]
+}

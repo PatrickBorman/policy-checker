@@ -1,0 +1,37 @@
+name: defer_to_resample
+description: >
+  Defer-to-resample (Ctrl-Z style): a flagged output is resampled once; if the resample is also flagged the
+  protocol defers to the trusted model. Written without assuming the trusted model is always available.
+provenance: modelled on Bhatt et al. 2025, "Ctrl-Z", defer-to-resample protocols
+env:
+  - {name: output_ready, desc: an output (original or resample) is ready}
+  - {name: flagged, desc: the monitor flags this output}
+  - {name: trusted_available, desc: the trusted model can take over}
+sys:
+  - {name: ship, desc: ship the output}
+  - {name: resample, desc: ask the untrusted model for a fresh sample}
+  - {name: defer, desc: replace with the trusted model's output}
+rules:
+  - id: G1
+    kind: guarantee
+    text: Every output is handled in the same step by exactly one of ship, resample or defer; nothing when no output is ready.
+    spectra:
+      - "G (output_ready -> (ship | resample | defer))"
+      - "G (!(ship & resample) & !(ship & defer) & !(resample & defer))"
+      - "G (!output_ready -> (!ship & !resample & !defer))"
+  - id: G2
+    kind: guarantee
+    text: Never ship a flagged output.
+    spectra: "G ((output_ready & flagged) -> !ship)"
+  - id: G3
+    kind: guarantee
+    text: Never resample twice in a row.
+    spectra: "G (resample -> !next(resample))"
+  - id: G4
+    kind: guarantee
+    text: Defer to the trusted model only when it is available.
+    spectra: "G (!trusted_available -> !defer)"
+  - id: A1
+    kind: assumption
+    text: A resample request is always answered with an output in the next step.
+    spectra: "G (resample -> next(output_ready))"

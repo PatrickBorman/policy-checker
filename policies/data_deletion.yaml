@@ -1,0 +1,32 @@
+name: data_deletion
+description: >
+  A data-management agent handling deletion requests under user rights and legal holds.
+provenance: modelled on GDPR-style deletion handling with legal-hold exceptions
+env:
+  - {name: req_delete, desc: a deletion request is pending}
+  - {name: user_request, desc: the request comes from the data subject}
+  - {name: legal_hold, desc: the data is under legal hold}
+sys:
+  - {name: delete, desc: delete the data}
+  - {name: retain, desc: refuse deletion}
+  - {name: escalate, desc: escalate to the privacy officer}
+rules:
+  - id: G1
+    kind: guarantee
+    text: Every request gets exactly one of delete, retain or escalate in the same step; nothing without a request.
+    spectra:
+      - "G (req_delete -> (delete | retain | escalate))"
+      - "G (!(delete & retain) & !(delete & escalate) & !(retain & escalate))"
+      - "G (!req_delete -> (!delete & !retain & !escalate))"
+  - id: G2
+    kind: guarantee
+    text: Never delete data under legal hold.
+    spectra: "G (legal_hold -> !delete)"
+  - id: G3
+    kind: guarantee
+    text: A data subject's request is never simply refused - it is deleted or escalated.
+    spectra: "G ((req_delete & user_request) -> !retain)"
+  - id: G4
+    kind: guarantee
+    text: Requests not under legal hold from the data subject are deleted without escalation.
+    spectra: "G ((req_delete & user_request & !legal_hold) -> delete)"

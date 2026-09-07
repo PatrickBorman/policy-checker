@@ -1,0 +1,42 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (req_delete -> (delete | retain | escalate))",
+        "G (!(delete & retain) & !(delete & escalate) & !(retain & escalate))",
+        "G (!req_delete -> (!delete & !retain & !escalate))"
+      ],
+      "note": "Exactly one of delete, retain, or escalate when req_delete is true; all false when req_delete is false.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G (legal_hold -> !delete)"
+      ],
+      "note": "If legal_hold is active, delete must be false.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((req_delete & user_request) -> !retain)"
+      ],
+      "note": "If req_delete and user_request are true, retain must be false.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((req_delete & !legal_hold & user_request) -> delete)"
+      ],
+      "note": "If req_delete, user_request, and not legal_hold, then delete must be true.",
+      "approximate": false
+    }
+  ]
+}

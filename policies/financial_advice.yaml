@@ -1,0 +1,33 @@
+name: financial_advice
+description: >
+  A consumer-finance assistant: generic information is fine, personalised advice must be referred to a
+  licensed reviewer.
+provenance: modelled on regulated financial-advice chatbot policies
+env:
+  - {name: query, desc: a customer question arrives}
+  - {name: personalised, desc: the question asks for advice specific to the customer's situation}
+  - {name: reviewer_available, desc: a licensed reviewer is available}
+sys:
+  - {name: answer, desc: answer the question directly}
+  - {name: generic, desc: give generic information only}
+  - {name: refer, desc: refer to a licensed reviewer}
+rules:
+  - id: G1
+    kind: guarantee
+    text: Every question gets exactly one of answer, generic or refer in the same step; nothing without a question.
+    spectra:
+      - "G (query -> (answer | generic | refer))"
+      - "G (!(answer & generic) & !(answer & refer) & !(generic & refer))"
+      - "G (!query -> (!answer & !generic & !refer))"
+  - id: G2
+    kind: guarantee
+    text: Personalised advice is never given directly.
+    spectra: "G (personalised -> !answer)"
+  - id: G3
+    kind: guarantee
+    text: Refer only when a reviewer is available.
+    spectra: "G (!reviewer_available -> !refer)"
+  - id: G4
+    kind: guarantee
+    text: Non-personalised questions are answered directly.
+    spectra: "G ((query & !personalised) -> answer)"

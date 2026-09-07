@@ -1,0 +1,50 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (output_ready -> ((use_untrusted & !defer_trusted & !audit) | (!use_untrusted & defer_trusted & !audit) | (!use_untrusted & !defer_trusted & audit)))",
+        "G (!output_ready -> (!use_untrusted & !defer_trusted & !audit))"
+      ],
+      "note": "When output is ready, exactly one routing action is chosen; otherwise, no action is chosen.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G (flagged -> !use_untrusted)"
+      ],
+      "note": "Do not use untrusted output if it is flagged by the monitor.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G (budget_exhausted -> !audit)"
+      ],
+      "note": "Auditing is prohibited when the budget is exhausted.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G (!trusted_available -> !defer_trusted)"
+      ],
+      "note": "Do not defer to the trusted model if it is not available.",
+      "approximate": false
+    },
+    {
+      "id": "A1",
+      "kind": "assumption",
+      "spectra": [
+        "G (budget_exhausted -> next(budget_exhausted))"
+      ],
+      "note": "Once the budget is exhausted, it remains exhausted in all subsequent steps.",
+      "approximate": false
+    }
+  ]
+}

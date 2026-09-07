@@ -1,0 +1,38 @@
+name: trusted_editing
+description: >
+  Trusted editing: suspicious outputs are rewritten by the trusted model before shipping; highly suspicious
+  ones go to audit while budget remains, and are edited when it does not.
+provenance: modelled on Greenblatt et al. 2023, "AI Control", trusted editing protocol
+env:
+  - {name: output_ready, desc: the untrusted model has produced an output}
+  - {name: flagged, desc: the monitor rates the output as suspicious}
+  - {name: high_suspicion, desc: the monitor rates the output as highly suspicious}
+  - {name: budget_exhausted, desc: the audit budget is exhausted}
+sys:
+  - {name: ship_untrusted, desc: ship the output as produced}
+  - {name: ship_edited, desc: ship the trusted model's rewrite}
+  - {name: audit, desc: send to a human auditor}
+rules:
+  - id: G1
+    kind: guarantee
+    text: Every output is handled in the same step by exactly one of ship_untrusted, ship_edited or audit, and nothing happens when there is no output.
+    spectra:
+      - "G (output_ready -> (ship_untrusted | ship_edited | audit))"
+      - "G (!(ship_untrusted & ship_edited) & !(ship_untrusted & audit) & !(ship_edited & audit))"
+      - "G (!output_ready -> (!ship_untrusted & !ship_edited & !audit))"
+  - id: G2
+    kind: guarantee
+    text: A flagged output is never shipped unedited.
+    spectra: "G ((output_ready & flagged) -> !ship_untrusted)"
+  - id: G3
+    kind: guarantee
+    text: A highly suspicious output is audited while budget remains.
+    spectra: "G ((output_ready & high_suspicion & !budget_exhausted) -> audit)"
+  - id: G4
+    kind: guarantee
+    text: Nothing is audited once the budget is exhausted.
+    spectra: "G (budget_exhausted -> !audit)"
+  - id: A1
+    kind: assumption
+    text: A highly suspicious output is always also flagged.
+    spectra: "G (high_suspicion -> flagged)"

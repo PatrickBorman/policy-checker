@@ -1,0 +1,59 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (incident -> pause)"
+      ],
+      "note": "An incident in the current step guarantees a pause in the same step.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((incident & severity_high) -> notify)"
+      ],
+      "note": "A high-severity incident triggers a notification in the same step.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G (resume -> (!incident & human_ack))"
+      ],
+      "note": "Resuming is only allowed if there is no incident and a human acknowledges in the same step.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G (!(pause & resume))"
+      ],
+      "note": "Pause and resume are mutually exclusive in every step.",
+      "approximate": false
+    },
+    {
+      "id": "G5",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((paused & human_ack & !incident) -> resume)"
+      ],
+      "note": "If paused, an acknowledged step without an incident forces a resume.",
+      "approximate": false
+    },
+    {
+      "id": "A1",
+      "kind": "assumption",
+      "spectra": [
+        "G (pause -> next(paused))",
+        "G ((paused & !resume) -> next(paused))"
+      ],
+      "note": "Pausing leads to being paused in the next step, and being paused persists unless resumed.",
+      "approximate": false
+    }
+  ]
+}

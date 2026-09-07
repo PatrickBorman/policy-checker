@@ -1,0 +1,51 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (req_refund -> (approve | reject | escalate))",
+        "G (!(approve & reject) & !(approve & escalate) & !(reject & escalate))",
+        "G (!req_refund -> (!approve & !reject & !escalate))"
+      ],
+      "note": "Exactly one action is chosen when there is a request, and no action is chosen when there is no request.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G (fraud_flag -> !approve)"
+      ],
+      "note": "If the account is fraud-flagged, approve must be false.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((amount_high & !manager_ok) -> !approve)"
+      ],
+      "note": "If the amount is high and manager has not approved, the refund cannot be approved.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G (!verified -> !approve)"
+      ],
+      "note": "If the customer is not verified, approve must be false.",
+      "approximate": false
+    },
+    {
+      "id": "G5",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((req_refund & verified & !amount_high & !fraud_flag) -> (approve & !escalate))"
+      ],
+      "note": "A requested, verified, low-value, unflagged refund must be approved and not escalated.",
+      "approximate": false
+    }
+  ]
+}

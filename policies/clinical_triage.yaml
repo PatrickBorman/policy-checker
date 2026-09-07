@@ -1,0 +1,34 @@
+name: clinical_triage
+description: >
+  A triage-support agent: recommendations, escalation to a clinician, and holding cases, with confidence
+  and urgency constraints.
+provenance: modelled on clinical decision-support deployment policies
+env:
+  - {name: case_ready, desc: a case awaits triage}
+  - {name: urgent, desc: the case is flagged urgent}
+  - {name: low_confidence, desc: the model's confidence is below threshold}
+  - {name: clinician_available, desc: a clinician is available to take an escalation}
+sys:
+  - {name: recommend, desc: issue a triage recommendation}
+  - {name: escalate, desc: escalate to a clinician}
+  - {name: hold, desc: hold the case}
+rules:
+  - id: G1
+    kind: guarantee
+    text: Every case gets exactly one of recommend, escalate or hold in the same step; nothing without a case.
+    spectra:
+      - "G (case_ready -> (recommend | escalate | hold))"
+      - "G (!(recommend & escalate) & !(recommend & hold) & !(escalate & hold))"
+      - "G (!case_ready -> (!recommend & !escalate & !hold))"
+  - id: G2
+    kind: guarantee
+    text: Never issue a recommendation at low confidence.
+    spectra: "G (low_confidence -> !recommend)"
+  - id: G3
+    kind: guarantee
+    text: Urgent cases are never held.
+    spectra: "G (urgent -> !hold)"
+  - id: G4
+    kind: guarantee
+    text: Escalate only when a clinician is available.
+    spectra: "G (!clinician_available -> !escalate)"

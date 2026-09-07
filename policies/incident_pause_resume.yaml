@@ -1,0 +1,43 @@
+name: incident_pause_resume
+description: >
+  Agentic incident response: pause the agent on a detected incident, notify on high severity, and resume only
+  after a human acknowledges.
+provenance: modelled on common agent incident-response runbooks (pause / notify / human ack / resume)
+env:
+  - {name: incident, desc: an incident is detected this step}
+  - {name: severity_high, desc: the incident is high severity}
+  - {name: human_ack, desc: a human acknowledged the incident this step}
+  - {name: paused, desc: the agent is currently paused}
+sys:
+  - {name: pause, desc: pause the agent}
+  - {name: resume, desc: resume the agent}
+  - {name: notify, desc: page the on-call human}
+rules:
+  - id: G1
+    kind: guarantee
+    text: An incident causes a pause in the same step.
+    spectra: "G (incident -> pause)"
+  - id: G2
+    kind: guarantee
+    text: A high-severity incident is notified in the same step.
+    spectra: "G ((incident & severity_high) -> notify)"
+  - id: G3
+    kind: guarantee
+    text: Never resume in a step with an incident, and never resume without a human acknowledgement in that step.
+    spectra:
+      - "G (incident -> !resume)"
+      - "G (!human_ack -> !resume)"
+  - id: G4
+    kind: guarantee
+    text: Pause and resume are never issued together.
+    spectra: "G (!(pause & resume))"
+  - id: G5
+    kind: guarantee
+    text: Every acknowledged incident-free step while paused resumes the agent.
+    spectra: "G ((paused & human_ack & !incident) -> resume)"
+  - id: A1
+    kind: assumption
+    text: Pausing takes effect next step, and the agent stays paused until resumed.
+    spectra:
+      - "G (pause -> next(paused))"
+      - "G ((paused & !resume) -> next(paused))"

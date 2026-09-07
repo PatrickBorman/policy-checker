@@ -1,0 +1,51 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((req_shell | req_write) -> (allow | deny | ask))",
+        "G (!(allow & deny) & !(allow & ask) & !(deny & ask))",
+        "G (!(req_shell | req_write) -> (!allow & !deny & !ask))"
+      ],
+      "note": "Exactly one decision is made if there is a request, and none if there is no request.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((req_shell & !in_sandbox & !user_approved) -> !allow)"
+      ],
+      "note": "Shell commands outside the sandbox require user approval in the same step to be allowed.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((req_write & in_sandbox) -> allow)"
+      ],
+      "note": "File writes inside the sandbox are always allowed.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G (user_approved -> allow)"
+      ],
+      "note": "If the user approved, the action is allowed.",
+      "approximate": false
+    },
+    {
+      "id": "A1",
+      "kind": "assumption",
+      "spectra": [
+        "G (!(req_shell | req_write) -> !user_approved)"
+      ],
+      "note": "The user cannot approve if there is no active request.",
+      "approximate": false
+    }
+  ]
+}

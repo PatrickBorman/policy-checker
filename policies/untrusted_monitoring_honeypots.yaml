@@ -1,0 +1,40 @@
+name: untrusted_monitoring_honeypots
+description: >
+  Untrusted monitoring with collusion detection: a second untrusted model monitors the first; synthetic
+  honeypot outputs are inserted, and a monitor that fails to flag a honeypot is treated as colluding.
+provenance: modelled on Greenblatt et al. 2023, "AI Control", untrusted monitoring with honeypots
+env:
+  - {name: output_ready, desc: an output is ready for routing}
+  - {name: honeypot, desc: this output is a synthetic honeypot known to be malicious}
+  - {name: monitor_flagged, desc: the untrusted monitor flagged the output}
+  - {name: budget_exhausted, desc: the human audit budget is exhausted}
+sys:
+  - {name: ship, desc: ship the output}
+  - {name: audit, desc: send to a human auditor}
+  - {name: shutdown, desc: halt the deployment and replace the monitor}
+rules:
+  - id: G1
+    kind: guarantee
+    text: Every output is shipped or audited in the same step, never both; nothing is shipped or audited when no output is ready.
+    spectra:
+      - "G (output_ready -> (ship | audit))"
+      - "G (!(ship & audit))"
+      - "G (!output_ready -> (!ship & !audit))"
+  - id: G2
+    kind: guarantee
+    text: A honeypot is never shipped.
+    spectra: "G ((output_ready & honeypot) -> !ship)"
+  - id: G3
+    kind: guarantee
+    text: If the monitor fails to flag a honeypot, shut down in that step.
+    spectra: "G ((output_ready & honeypot & !monitor_flagged) -> shutdown)"
+  - id: G4
+    kind: guarantee
+    text: Shut down only when a honeypot was missed.
+    spectra: "G (shutdown -> (output_ready & honeypot & !monitor_flagged))"
+  - id: G5
+    kind: guarantee
+    text: Flagged outputs are audited while budget remains, and nothing is audited once it is exhausted.
+    spectra:
+      - "G ((output_ready & monitor_flagged & !budget_exhausted) -> audit)"
+      - "G (budget_exhausted -> !audit)"

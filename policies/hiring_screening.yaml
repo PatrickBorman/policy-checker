@@ -1,0 +1,38 @@
+name: hiring_screening
+description: >
+  A CV-screening agent with fairness and human-review constraints.
+provenance: modelled on automated hiring-tool governance policies
+env:
+  - {name: cv_ready, desc: a CV awaits a decision}
+  - {name: protected_attr, desc: the CV reveals a protected characteristic}
+  - {name: human_available, desc: a human reviewer is available}
+sys:
+  - {name: shortlist, desc: shortlist the candidate}
+  - {name: reject, desc: reject the candidate}
+  - {name: hold, desc: hold for later}
+rules:
+  - id: G1
+    kind: guarantee
+    text: Every CV gets exactly one of shortlist, reject or hold in the same step; nothing without a CV.
+    spectra:
+      - "G (cv_ready -> (shortlist | reject | hold))"
+      - "G (!(shortlist & reject) & !(shortlist & hold) & !(reject & hold))"
+      - "G (!cv_ready -> (!shortlist & !reject & !hold))"
+  - id: G2
+    kind: guarantee
+    text: Never automatically reject a CV that reveals a protected characteristic.
+    spectra: "G (protected_attr -> !reject)"
+  - id: G3
+    kind: guarantee
+    text: Never shortlist without a human reviewer available.
+    spectra: "G (!human_available -> !shortlist)"
+  - id: G4
+    kind: guarantee
+    text: Never hold a CV two steps running.
+    spectra: "G (hold -> !next(hold))"
+  - id: A1
+    kind: assumption
+    text: A held CV comes back next step, with the same characteristics.
+    spectra:
+      - "G (hold -> next(cv_ready))"
+      - "G ((hold & protected_attr) -> next(protected_attr))"

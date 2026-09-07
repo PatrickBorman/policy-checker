@@ -1,0 +1,51 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (cv_ready -> ((shortlist & !reject & !hold) | (!shortlist & reject & !hold) | (!shortlist & !reject & hold)))",
+        "G (!cv_ready -> (!shortlist & !reject & !hold))"
+      ],
+      "note": "Exactly one decision is made if a CV is ready, and no decision is made if no CV is ready.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((protected_attr & !human_available) -> !reject)"
+      ],
+      "note": "Interpreted 'automatically reject' as rejecting when no human reviewer is available.",
+      "approximate": true
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G (shortlist -> human_available)"
+      ],
+      "note": "Shortlisting requires a human reviewer to be available in the same step.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G (hold -> !next(hold))"
+      ],
+      "note": "Cannot hold in two consecutive steps.",
+      "approximate": false
+    },
+    {
+      "id": "A1",
+      "kind": "assumption",
+      "spectra": [
+        "G (hold -> next(cv_ready))",
+        "G (hold -> (protected_attr <-> next(protected_attr)))"
+      ],
+      "note": "If held, the CV is ready in the next step and retains its protected attribute status.",
+      "approximate": false
+    }
+  ]
+}

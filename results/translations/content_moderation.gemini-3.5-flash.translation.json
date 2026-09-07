@@ -1,0 +1,42 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (post_ready -> (publish | remove | hold))",
+        "G (!(publish & remove) & !(publish & hold) & !(remove & hold))",
+        "G (!post_ready -> (!publish & !remove & !hold))"
+      ],
+      "note": "Exactly one action when post is ready, and no action when there is no post.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G (toxic -> !publish)"
+      ],
+      "note": "Toxic posts cannot be published.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G (appeal_pending -> !remove)"
+      ],
+      "note": "Posts with pending appeals cannot be removed.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G (hold -> human_available)"
+      ],
+      "note": "Holding a post requires a human reviewer to be available.",
+      "approximate": false
+    }
+  ]
+}

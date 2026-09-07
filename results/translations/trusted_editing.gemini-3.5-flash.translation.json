@@ -1,0 +1,50 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (output_ready -> ((ship_untrusted & !ship_edited & !audit) | (!ship_untrusted & ship_edited & !audit) | (!ship_untrusted & !ship_edited & audit)))",
+        "G (!output_ready -> (!ship_untrusted & !ship_edited & !audit))"
+      ],
+      "note": "When output is ready, exactly one action is taken; otherwise, no action is taken.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((output_ready & flagged) -> !ship_untrusted)"
+      ],
+      "note": "Flagged outputs cannot be shipped untrusted.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((output_ready & high_suspicion & !budget_exhausted) -> audit)"
+      ],
+      "note": "Highly suspicious outputs must be audited if budget is not exhausted.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G (budget_exhausted -> !audit)"
+      ],
+      "note": "No auditing is allowed when the budget is exhausted.",
+      "approximate": false
+    },
+    {
+      "id": "A1",
+      "kind": "assumption",
+      "spectra": [
+        "G ((output_ready & high_suspicion) -> flagged)"
+      ],
+      "note": "Highly suspicious outputs are always flagged by the monitor.",
+      "approximate": false
+    }
+  ]
+}

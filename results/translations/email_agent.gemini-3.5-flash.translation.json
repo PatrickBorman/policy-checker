@@ -1,0 +1,51 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (req_send -> (allow | block | escalate))",
+        "G (!(allow & block) & !(allow & escalate) & !(block & escalate))",
+        "G (!req_send -> (!allow & !block & !escalate))"
+      ],
+      "note": "If there is a proposal, exactly one action is chosen; otherwise, no action is taken.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G (allow -> user_confirm)"
+      ],
+      "note": "Allowing a send requires user confirmation in the same step.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G (escalate -> !next(escalate))"
+      ],
+      "note": "Escalate cannot be true in two consecutive steps.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((refund_open & req_send) -> !block)"
+      ],
+      "note": "If a refund is open and there is a proposal, block must not be chosen.",
+      "approximate": false
+    },
+    {
+      "id": "A1",
+      "kind": "assumption",
+      "spectra": [
+        "G (user_confirm -> req_send)"
+      ],
+      "note": "The user can only confirm in steps where a send is proposed.",
+      "approximate": false
+    }
+  ]
+}

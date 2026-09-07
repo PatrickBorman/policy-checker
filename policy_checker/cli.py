@@ -28,8 +28,21 @@ def check_one(path: Path, out_dir: Path, use_llm: bool, model: str, timeout: int
         from .translate import translate, to_constraints, make_client, GeminiClient
         client = make_client()
         res["translator"] = client.model if isinstance(client, GeminiClient) else model
-        tr = translate(ps, client=client, model=model)
-        (out_dir / f"{ps.name}.translation.json").write_text(json.dumps(tr.model_dump(), indent=2))
+        from .translate import Translation
+        cached = sorted(out_dir.glob(f"{ps.name}.*.translation.json"))
+        if cached:
+            tr = Translation.model_validate_json(cached[0].read_text())
+            res["translator"] = cached[0].name[len(ps.name) + 1:-len(".translation.json")]
+            res["translation_cached"] = True
+        else:
+            try:
+                tr = translate(ps, client=client, model=model)
+            except Exception as e:
+                res["error"] = f"translation failed: {str(e)[:300]}"
+                return res
+            if isinstance(client, GeminiClient):
+                res["translator"] = client.model      # may have fallen back on quota
+            (out_dir / f"{ps.name}.{res['translator']}.translation.json").write_text(json.dumps(tr.model_dump(), indent=2))
         constraints = to_constraints(tr)
         res["approximate_rules"] = [t.id for t in tr.rules if t.approximate]
     else:
@@ -55,6 +68,7 @@ def check_one(path: Path, out_dir: Path, use_llm: bool, model: str, timeout: int
             mspec = out_dir / f"{ps.name}.manual.spectra"; mspec.write_text(mtext)
             res["manual_realizable"] = S.check_realizable(mspec, timeout)
             res["agrees_with_manual"] = res["manual_realizable"] is True
+            res["agreement"] = "exact" if res["agrees_with_manual"] else "disagree"
         return res
 
     res["y_sat"] = S.check_y_sat(spec, timeout)
@@ -75,6 +89,7 @@ def check_one(path: Path, out_dir: Path, use_llm: bool, model: str, timeout: int
         if not mreal:
             res["manual_core_rules"] = sorted({mmap.get(i, f"line{i}") for i in S.unrealizable_core(mspec, timeout)})
         res["agrees_with_manual"] = (mreal == realizable) and (mreal or res.get("core_rules") == res.get("manual_core_rules"))
+        res["agreement"] = ("exact" if res["agrees_with_manual"] else "verdict" if mreal == realizable else "disagree")
 
     if do_repair:
         try:
@@ -121,6 +136,8 @@ def render(res: dict, ps_desc: str = "") -> str:
 def main(argv=None):
     ap = argparse.ArgumentParser(prog="policy-check", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
+    v = sub.add_parser("verify", help="core-minimality and repair-validity checks on every set (hand-written encodings)")
+    v.add_argument("path"); v.add_argument("--out", default="out"); v.add_argument("--timeout", type=int, default=120)
     for name in ("check", "batch"):
         p = sub.add_parser(name)
         p.add_argument("path")
@@ -132,6 +149,14 @@ def main(argv=None):
         p.add_argument("--json", action="store_true", help="print JSON instead of text")
     a = ap.parse_args(argv)
     out = Path(a.out)
+    if a.cmd == "verify":
+        from .verify import verify_all
+        rs = verify_all(Path(a.path), out, a.timeout)
+        un = [r for r in rs if not r["realizable"]]
+        print(f"== {len(rs)} sets, {len(un)} unrealisable; cores minimal: {sum(r['core_minimal'] for r in un)}/{len(un)}, "
+              f"complete: {sum(r['core_complete'] for r in un)}/{len(un)}; repairs found: {sum(bool(r['repairs']) for r in un)}/{len(un)}, "
+              f"valid: {sum(r.get('repair_valid', False) for r in un)}, non-vacuous: {sum(r.get('repair_satisfiable', False) for r in un)}")
+        return 0
     paths = [Path(a.path)] if a.cmd == "check" else sorted(Path(a.path).glob("*.yaml"))
     results = []
     for p in paths:

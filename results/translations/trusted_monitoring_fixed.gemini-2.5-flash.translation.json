@@ -1,0 +1,54 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (output_ready -> (use_untrusted | defer_trusted | audit))",
+        "G (!(use_untrusted & defer_trusted))",
+        "G (!(use_untrusted & audit))",
+        "G (!(defer_trusted & audit))",
+        "G (!output_ready -> (!use_untrusted & !defer_trusted & !audit))"
+      ],
+      "note": "Encoded 'exactly one' and 'nothing when no output' as separate safety properties.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G (flagged -> !use_untrusted)"
+      ],
+      "note": "Interpreted 'ship' as use_untrusted.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((flagged & !budget_exhausted) -> audit)"
+      ],
+      "note": "Encoded as a safety property.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((budget_exhausted & flagged) -> defer_trusted)",
+        "G ((budget_exhausted & flagged) -> !audit)"
+      ],
+      "note": "Encoded as a safety property, ensuring deferral and no audit under the specified conditions.",
+      "approximate": false
+    },
+    {
+      "id": "A1",
+      "kind": "assumption",
+      "spectra": [
+        "G (trusted_available)"
+      ],
+      "note": "Encoded as a global safety assumption.",
+      "approximate": false
+    }
+  ]
+}

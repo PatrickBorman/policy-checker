@@ -1,0 +1,42 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (req_tool -> (allow | deny))",
+        "G (!(allow & deny))",
+        "G (!req_tool -> (!allow & !deny))"
+      ],
+      "note": "Encoded as simultaneous conditions in every step.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G (kill_switch -> deny)"
+      ],
+      "note": "Encoded as a universal implication. This rule can contradict G1 if kill_switch is true but no tool is requested.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G (budget_exhausted -> deny)"
+      ],
+      "note": "Encoded as a universal implication. This rule can contradict G1 if budget_exhausted is true but no tool is requested.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((req_tool & essential & !kill_switch) -> allow)"
+      ],
+      "note": "Encoded as a conditional allowance. This rule can contradict G3 if an essential call is requested while the budget is exhausted and the kill switch is off.",
+      "approximate": false
+    }
+  ]
+}

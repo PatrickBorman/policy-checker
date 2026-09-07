@@ -1,0 +1,336 @@
+[
+  {
+    "policy_set": "agent_handoff",
+    "realizable": true
+  },
+  {
+    "policy_set": "ai_act_human_oversight",
+    "realizable": true
+  },
+  {
+    "policy_set": "break_glass_access",
+    "realizable": false,
+    "core": [
+      "G2",
+      "G3"
+    ],
+    "realizable_without": {
+      "G1": false,
+      "G2": true,
+      "G3": true,
+      "G4": false,
+      "A1": false
+    },
+    "core_minimal": true,
+    "core_complete": true,
+    "repair_seconds": 2.75,
+    "repairs": [
+      "G(!(!approved & emergency & req_elevated))"
+    ],
+    "repair_valid": true,
+    "repair_satisfiable": true
+  },
+  {
+    "policy_set": "browsing_agent_pii",
+    "realizable": true
+  },
+  {
+    "policy_set": "clinical_triage",
+    "realizable": false,
+    "core": [
+      "G1",
+      "G2",
+      "G3",
+      "G4"
+    ],
+    "realizable_without": {
+      "G1": true,
+      "G2": true,
+      "G3": true,
+      "G4": true
+    },
+    "core_minimal": true,
+    "core_complete": true,
+    "repair_seconds": 2.53,
+    "repairs": [
+      "G(!(low_confidence & urgent & !clinician_available & case_ready))"
+    ],
+    "repair_valid": true,
+    "repair_satisfiable": true
+  },
+  {
+    "policy_set": "coding_agent_permissions",
+    "realizable": true
+  },
+  {
+    "policy_set": "content_moderation",
+    "realizable": false,
+    "core": [
+      "G1",
+      "G2",
+      "G3",
+      "G4"
+    ],
+    "realizable_without": {
+      "G1": true,
+      "G2": true,
+      "G3": true,
+      "G4": true
+    },
+    "core_minimal": true,
+    "core_complete": true,
+    "repair_seconds": 2.46,
+    "repairs": [
+      "G(!(appeal_pending & post_ready & toxic & !human_available))"
+    ],
+    "repair_valid": true,
+    "repair_satisfiable": true
+  },
+  {
+    "policy_set": "data_deletion",
+    "realizable": true
+  },
+  {
+    "policy_set": "defer_to_resample",
+    "realizable": false,
+    "core": [
+      "G1",
+      "G2",
+      "G3",
+      "G4"
+    ],
+    "realizable_without": {
+      "G1": true,
+      "G2": true,
+      "G3": true,
+      "G4": true,
+      "A1": false
+    },
+    "core_minimal": true,
+    "core_complete": true,
+    "repair_seconds": 2.09,
+    "repairs": [
+      "G(!(flagged & output_ready & !trusted_available))"
+    ],
+    "repair_valid": true,
+    "repair_satisfiable": true
+  },
+  {
+    "policy_set": "drone_geofence",
+    "realizable": true
+  },
+  {
+    "policy_set": "email_agent",
+    "realizable": false,
+    "core": [
+      "G1",
+      "G2",
+      "G3",
+      "G4"
+    ],
+    "realizable_without": {
+      "G1": true,
+      "G2": true,
+      "G3": true,
+      "G4": true,
+      "A1": false
+    },
+    "core_minimal": true,
+    "core_complete": true,
+    "repair_seconds": 2.02,
+    "repairs": [
+      "G((req_send & refund_open & !user_confirm) -> next(!(req_send & !user_confirm & refund_open)))"
+    ],
+    "repair_valid": true,
+    "repair_satisfiable": true
+  },
+  {
+    "policy_set": "financial_advice",
+    "realizable": true
+  },
+  {
+    "policy_set": "hiring_screening",
+    "realizable": false,
+    "core": [
+      "G1",
+      "G2",
+      "G3",
+      "G4"
+    ],
+    "realizable_without": {
+      "G1": true,
+      "G2": true,
+      "G3": true,
+      "G4": true,
+      "A1": false
+    },
+    "core_minimal": true,
+    "core_complete": true,
+    "repair_seconds": 2.07,
+    "repairs": [
+      "G(!(cv_ready & protected_attr & !human_available))"
+    ],
+    "repair_valid": true,
+    "repair_satisfiable": true
+  },
+  {
+    "policy_set": "ide_agent_allow_deny",
+    "realizable": false,
+    "core": [
+      "G1",
+      "G2",
+      "G4"
+    ],
+    "realizable_without": {
+      "G1": true,
+      "G2": true,
+      "G3": false,
+      "G4": true,
+      "A1": false
+    },
+    "core_minimal": true,
+    "core_complete": true,
+    "repair_seconds": 2.02,
+    "repairs": [
+      "G(!(matches_deny & user_approved & req))"
+    ],
+    "repair_valid": true,
+    "repair_satisfiable": true
+  },
+  {
+    "policy_set": "incident_pause_resume",
+    "realizable": true
+  },
+  {
+    "policy_set": "support_refunds",
+    "realizable": true
+  },
+  {
+    "policy_set": "tool_budget_kill_switch",
+    "realizable": false,
+    "core": [
+      "G3",
+      "G4"
+    ],
+    "realizable_without": {
+      "G1": false,
+      "G2": false,
+      "G3": true,
+      "G4": true
+    },
+    "core_minimal": true,
+    "core_complete": true,
+    "repair_seconds": 2.0,
+    "repairs": [
+      "G(!(essential & req_tool & budget_exhausted & !kill_switch))"
+    ],
+    "repair_valid": true,
+    "repair_satisfiable": true
+  },
+  {
+    "policy_set": "trading_agent_guard",
+    "realizable": false,
+    "core": [
+      "G1",
+      "G2",
+      "G4",
+      "G5"
+    ],
+    "realizable_without": {
+      "G1": true,
+      "G2": true,
+      "G3": false,
+      "G4": true,
+      "G5": true,
+      "A1": false
+    },
+    "core_minimal": true,
+    "core_complete": true,
+    "repair_seconds": 2.03,
+    "repairs": [
+      "G(!(market_halt & req_trade & officer_ok))"
+    ],
+    "repair_valid": true,
+    "repair_satisfiable": true
+  },
+  {
+    "policy_set": "trusted_editing",
+    "realizable": true
+  },
+  {
+    "policy_set": "trusted_monitoring",
+    "realizable": false,
+    "core": [
+      "G1",
+      "G2",
+      "G3",
+      "G4"
+    ],
+    "realizable_without": {
+      "G1": true,
+      "G2": true,
+      "G3": true,
+      "G4": true,
+      "A1": false
+    },
+    "core_minimal": true,
+    "core_complete": true,
+    "repair_seconds": 2.05,
+    "repairs": [
+      "G(!(!trusted_available & budget_exhausted & flagged & output_ready))"
+    ],
+    "repair_valid": true,
+    "repair_satisfiable": true
+  },
+  {
+    "policy_set": "trusted_monitoring_fixed",
+    "realizable": true
+  },
+  {
+    "policy_set": "untrusted_monitoring_honeypots",
+    "realizable": false,
+    "core": [
+      "G1",
+      "G2",
+      "G5"
+    ],
+    "realizable_without": {
+      "G1": true,
+      "G2": true,
+      "G3": false,
+      "G4": false,
+      "G5": true
+    },
+    "core_minimal": true,
+    "core_complete": true,
+    "repair_seconds": 2.3,
+    "repairs": [
+      "G(!(honeypot & output_ready & budget_exhausted))"
+    ],
+    "repair_valid": true,
+    "repair_satisfiable": true
+  },
+  {
+    "policy_set": "vehicle_remote_ops",
+    "realizable": false,
+    "core": [
+      "G1",
+      "G3",
+      "G4"
+    ],
+    "realizable_without": {
+      "G1": true,
+      "G2": false,
+      "G3": true,
+      "G4": true
+    },
+    "core_minimal": true,
+    "core_complete": true,
+    "repair_seconds": 1.96,
+    "repairs": [
+      "G(!(operator_stop & low_battery))"
+    ],
+    "repair_valid": true,
+    "repair_satisfiable": true
+  }
+]

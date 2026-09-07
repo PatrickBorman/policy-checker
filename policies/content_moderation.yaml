@@ -1,0 +1,33 @@
+name: content_moderation
+description: >
+  A moderation agent deciding whether user posts go live, with toxicity, appeals and human-review constraints.
+provenance: modelled on platform content-moderation policies with an appeals process
+env:
+  - {name: post_ready, desc: a post awaits a decision}
+  - {name: toxic, desc: the classifier rates the post as toxic}
+  - {name: appeal_pending, desc: the author has an open appeal on this post}
+  - {name: human_available, desc: a human reviewer is available}
+sys:
+  - {name: publish, desc: make the post visible}
+  - {name: remove, desc: remove the post}
+  - {name: hold, desc: keep it pending for human review}
+rules:
+  - id: G1
+    kind: guarantee
+    text: Every post gets exactly one of publish, remove or hold in the same step; nothing without a post.
+    spectra:
+      - "G (post_ready -> (publish | remove | hold))"
+      - "G (!(publish & remove) & !(publish & hold) & !(remove & hold))"
+      - "G (!post_ready -> (!publish & !remove & !hold))"
+  - id: G2
+    kind: guarantee
+    text: Toxic posts are never published.
+    spectra: "G (toxic -> !publish)"
+  - id: G3
+    kind: guarantee
+    text: A post under appeal is never removed.
+    spectra: "G (appeal_pending -> !remove)"
+  - id: G4
+    kind: guarantee
+    text: Posts are held for human review only when a reviewer is available.
+    spectra: "G (!human_available -> !hold)"

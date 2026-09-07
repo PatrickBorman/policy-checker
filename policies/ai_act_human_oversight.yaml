@@ -1,0 +1,38 @@
+name: ai_act_human_oversight
+description: >
+  Human-oversight obligations for a high-risk automated decision system: anomalies stop automatic action,
+  overrides are honoured, deferral needs a human.
+provenance: modelled on EU AI Act Article 14 human-oversight requirements (paraphrased, not legal text)
+env:
+  - {name: decision_ready, desc: a decision is due this step}
+  - {name: anomaly, desc: the system detects an anomaly or unexpected behaviour}
+  - {name: override, desc: a human requests to override or interrupt}
+  - {name: human_available, desc: a human overseer is available}
+sys:
+  - {name: act_auto, desc: act automatically}
+  - {name: defer_human, desc: hand the decision to the human overseer}
+  - {name: halt, desc: halt without deciding}
+rules:
+  - id: G1
+    kind: guarantee
+    text: Each decision is handled in the same step by exactly one of act_auto, defer_human or halt; nothing when no decision is due.
+    spectra:
+      - "G (decision_ready -> (act_auto | defer_human | halt))"
+      - "G (!(act_auto & defer_human) & !(act_auto & halt) & !(defer_human & halt))"
+      - "G (!decision_ready -> (!act_auto & !defer_human & !halt))"
+  - id: G2
+    kind: guarantee
+    text: Never act automatically when an anomaly is detected.
+    spectra: "G (anomaly -> !act_auto)"
+  - id: G3
+    kind: guarantee
+    text: A human override request is always honoured - the system does not act automatically in that step.
+    spectra: "G (override -> !act_auto)"
+  - id: G4
+    kind: guarantee
+    text: Decisions are deferred to a human only when one is available.
+    spectra: "G (!human_available -> !defer_human)"
+  - id: G5
+    kind: guarantee
+    text: Without an anomaly or an override, the system acts automatically.
+    spectra: "G ((decision_ready & !anomaly & !override) -> act_auto)"

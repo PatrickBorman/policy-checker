@@ -1,0 +1,41 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (query -> ((answer & !generic & !refer) | (!answer & generic & !refer) | (!answer & !generic & refer)))",
+        "G (!query -> (!answer & !generic & !refer))"
+      ],
+      "note": "If there is a query, exactly one action is taken; if no query, no action is taken.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((query & personalised) -> !answer)"
+      ],
+      "note": "Personalised queries cannot be answered directly.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G (refer -> reviewer_available)"
+      ],
+      "note": "Referral is only allowed if a reviewer is available.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((query & !personalised) -> answer)"
+      ],
+      "note": "Queries that are not personalised must be answered directly.",
+      "approximate": false
+    }
+  ]
+}

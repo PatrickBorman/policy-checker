@@ -1,0 +1,35 @@
+name: agent_handoff
+description: >
+  A front-line agent deciding whether to handle a task itself, hand off to a specialist agent, or refuse.
+provenance: modelled on multi-agent hand-off policies with user opt-outs
+env:
+  - {name: task_ready, desc: a task is waiting}
+  - {name: sensitive, desc: the task touches sensitive data}
+  - {name: specialist_available, desc: a specialist agent is available}
+  - {name: opted_out, desc: the user opted out of hand-offs to other agents}
+sys:
+  - {name: handle, desc: handle it here}
+  - {name: handoff, desc: hand off to the specialist}
+  - {name: refuse, desc: decline the task}
+rules:
+  - id: G1
+    kind: guarantee
+    text: Every task gets exactly one of handle, handoff or refuse in the same step; nothing without a task.
+    spectra:
+      - "G (task_ready -> (handle | handoff | refuse))"
+      - "G (!(handle & handoff) & !(handle & refuse) & !(handoff & refuse))"
+      - "G (!task_ready -> (!handle & !handoff & !refuse))"
+  - id: G2
+    kind: guarantee
+    text: Sensitive tasks are never handled by the front-line agent.
+    spectra: "G (sensitive -> !handle)"
+  - id: G3
+    kind: guarantee
+    text: Never hand off when the user has opted out, or when no specialist is available.
+    spectra:
+      - "G (opted_out -> !handoff)"
+      - "G (!specialist_available -> !handoff)"
+  - id: G4
+    kind: guarantee
+    text: Non-sensitive tasks are never refused.
+    spectra: "G ((task_ready & !sensitive) -> !refuse)"

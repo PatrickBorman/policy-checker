@@ -1,0 +1,42 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (task_ready -> (handle | handoff | refuse))",
+        "G (!(handle & handoff) & !(handle & refuse) & !(handoff & refuse))",
+        "G (!task_ready -> (!handle & !handoff & !refuse))"
+      ],
+      "note": "Exactly one action is chosen when task is ready, and no action is chosen when there is no task.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G (sensitive -> !handle)"
+      ],
+      "note": "Sensitive tasks cannot be handled by the front-line agent.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((opted_out | !specialist_available) -> !handoff)"
+      ],
+      "note": "Handoff is forbidden if the user opted out or if no specialist is available.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((task_ready & !sensitive) -> !refuse)"
+      ],
+      "note": "Non-sensitive tasks that are ready must not be refused.",
+      "approximate": false
+    }
+  ]
+}

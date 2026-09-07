@@ -1,0 +1,31 @@
+name: vehicle_remote_ops
+description: >
+  Remote-operations rules for an autonomous ground vehicle: obstacles, operator stop, low battery.
+provenance: modelled on autonomous-vehicle remote-operation safety rules
+env:
+  - {name: obstacle, desc: an obstacle is detected ahead}
+  - {name: operator_stop, desc: the remote operator commands a stop}
+  - {name: low_battery, desc: battery is below the return threshold}
+sys:
+  - {name: proceed, desc: continue the mission}
+  - {name: stop, desc: stop in place}
+  - {name: return_home, desc: abort and return to base}
+rules:
+  - id: G1
+    kind: guarantee
+    text: In every step exactly one of proceed, stop or return_home is chosen.
+    spectra:
+      - "G (proceed | stop | return_home)"
+      - "G (!(proceed & stop) & !(proceed & return_home) & !(stop & return_home))"
+  - id: G2
+    kind: guarantee
+    text: Never proceed into an obstacle.
+    spectra: "G (obstacle -> !proceed)"
+  - id: G3
+    kind: guarantee
+    text: An operator stop command is obeyed in the same step.
+    spectra: "G (operator_stop -> stop)"
+  - id: G4
+    kind: guarantee
+    text: On low battery the vehicle returns home.
+    spectra: "G (low_battery -> return_home)"

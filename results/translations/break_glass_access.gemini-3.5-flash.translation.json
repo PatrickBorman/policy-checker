@@ -1,0 +1,50 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (req_elevated -> ((grant & !deny & !hold) | (!grant & deny & !hold) | (!grant & !deny & hold)))",
+        "G (!req_elevated -> (!grant & !deny & !hold))"
+      ],
+      "note": "If there is a request, exactly one of grant, deny, or hold is chosen; otherwise, none are chosen.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G (grant -> approved)"
+      ],
+      "note": "Granting permissions requires approval in the same step.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((emergency & req_elevated) -> grant)"
+      ],
+      "note": "In an emergency, any active request is granted immediately.",
+      "approximate": true
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G (hold -> !next(hold))"
+      ],
+      "note": "The hold action cannot be active in two consecutive steps.",
+      "approximate": false
+    },
+    {
+      "id": "A1",
+      "kind": "assumption",
+      "spectra": [
+        "G (approved -> req_elevated)"
+      ],
+      "note": "Approvals only occur when there is an active request.",
+      "approximate": false
+    }
+  ]
+}

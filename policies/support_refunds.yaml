@@ -1,0 +1,38 @@
+name: support_refunds
+description: >
+  A customer-support agent that can approve refunds, with verification, amount and fraud controls.
+provenance: modelled on customer-service agent refund policies
+env:
+  - {name: req_refund, desc: a refund is requested this step}
+  - {name: amount_high, desc: the amount is above the agent's limit}
+  - {name: verified, desc: the customer's identity is verified}
+  - {name: fraud_flag, desc: the account carries a fraud flag}
+  - {name: manager_ok, desc: a manager approved this refund this step}
+sys:
+  - {name: approve, desc: approve the refund}
+  - {name: reject, desc: reject the refund}
+  - {name: escalate, desc: hand to a human}
+rules:
+  - id: G1
+    kind: guarantee
+    text: Every request gets exactly one of approve, reject or escalate in the same step; nothing without a request.
+    spectra:
+      - "G (req_refund -> (approve | reject | escalate))"
+      - "G (!(approve & reject) & !(approve & escalate) & !(reject & escalate))"
+      - "G (!req_refund -> (!approve & !reject & !escalate))"
+  - id: G2
+    kind: guarantee
+    text: Never approve a refund on a fraud-flagged account.
+    spectra: "G (fraud_flag -> !approve)"
+  - id: G3
+    kind: guarantee
+    text: High-value refunds are approved only with a manager's approval in the same step.
+    spectra: "G ((amount_high & !manager_ok) -> !approve)"
+  - id: G4
+    kind: guarantee
+    text: Refunds for unverified customers are never approved.
+    spectra: "G (!verified -> !approve)"
+  - id: G5
+    kind: guarantee
+    text: A verified, low-value, unflagged refund is approved without escalation.
+    spectra: "G ((req_refund & verified & !amount_high & !fraud_flag) -> approve)"

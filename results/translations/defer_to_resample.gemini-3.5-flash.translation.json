@@ -1,0 +1,50 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (output_ready -> ((ship & !resample & !defer) | (!ship & resample & !defer) | (!ship & !resample & defer)))",
+        "G (!output_ready -> (!ship & !resample & !defer))"
+      ],
+      "note": "When output is ready, exactly one action is taken; otherwise, no action is taken.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G (flagged -> !ship)"
+      ],
+      "note": "Do not ship if the output is flagged.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G (resample -> !next(resample))"
+      ],
+      "note": "Resample cannot be chosen in two consecutive steps.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G (defer -> trusted_available)"
+      ],
+      "note": "Defer only if the trusted model is available.",
+      "approximate": false
+    },
+    {
+      "id": "A1",
+      "kind": "assumption",
+      "spectra": [
+        "G (resample -> next(output_ready))"
+      ],
+      "note": "If we request a resample, the next step will have an output ready.",
+      "approximate": false
+    }
+  ]
+}

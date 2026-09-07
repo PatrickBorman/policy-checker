@@ -1,0 +1,62 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (req_trade -> (execute | reject | queue))",
+        "G (!(execute & reject))",
+        "G (!(execute & queue))",
+        "G (!(reject & queue))",
+        "G (!req_trade -> (!execute & !reject & !queue))"
+      ],
+      "note": "Every proposal gets at least one decision, at most one decision, and no decision without a proposal.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G (market_halt -> !execute)"
+      ],
+      "note": "Direct translation: if market is halted, do not execute.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((over_limit & execute) -> officer_ok)"
+      ],
+      "note": "Direct translation: over-limit trades are executed only with officer approval.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G (queue -> !next(queue))"
+      ],
+      "note": "Direct translation: if an order is queued, it cannot be queued in the next step.",
+      "approximate": false
+    },
+    {
+      "id": "G5",
+      "kind": "guarantee",
+      "spectra": [
+        "G (officer_ok -> !reject)"
+      ],
+      "note": "Direct translation: if the officer approved, do not reject.",
+      "approximate": false
+    },
+    {
+      "id": "A1",
+      "kind": "assumption",
+      "spectra": [
+        "G (queue -> next(req_trade))"
+      ],
+      "note": "If an order is queued, the environment will propose a trade in the next step.",
+      "approximate": false
+    }
+  ]
+}

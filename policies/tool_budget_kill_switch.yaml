@@ -1,0 +1,32 @@
+name: tool_budget_kill_switch
+description: >
+  Tool-call gating for an agent with a spend budget, an essential-call carve-out and an operator kill switch.
+provenance: modelled on agent platform budget/kill-switch policies
+env:
+  - {name: req_tool, desc: the agent requests a tool call}
+  - {name: essential, desc: the call is marked essential to complete the current task}
+  - {name: budget_exhausted, desc: the spend budget is exhausted}
+  - {name: kill_switch, desc: the operator has engaged the kill switch}
+sys:
+  - {name: allow, desc: the call proceeds}
+  - {name: deny, desc: the call is refused}
+rules:
+  - id: G1
+    kind: guarantee
+    text: Every requested call is allowed or denied in the same step, never both; nothing when there is no request.
+    spectra:
+      - "G (req_tool -> (allow | deny))"
+      - "G (!(allow & deny))"
+      - "G (!req_tool -> (!allow & !deny))"
+  - id: G2
+    kind: guarantee
+    text: When the kill switch is engaged, every call is denied.
+    spectra: "G (kill_switch -> !allow)"
+  - id: G3
+    kind: guarantee
+    text: When the budget is exhausted, every call is denied.
+    spectra: "G (budget_exhausted -> !allow)"
+  - id: G4
+    kind: guarantee
+    text: Essential calls are always allowed unless the kill switch is engaged.
+    spectra: "G ((req_tool & essential & !kill_switch) -> allow)"

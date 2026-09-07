@@ -1,0 +1,42 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (case_ready -> (recommend | escalate | hold))",
+        "G (!(recommend & escalate) & !(recommend & hold) & !(escalate & hold))",
+        "G (!case_ready -> (!recommend & !escalate & !hold))"
+      ],
+      "note": "If a case is ready, exactly one action is chosen; if no case is ready, no action is chosen.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G (low_confidence -> !recommend)"
+      ],
+      "note": "Recommendation is prohibited when confidence is low.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G (urgent -> !hold)"
+      ],
+      "note": "Holding is prohibited when the case is urgent.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G (escalate -> clinician_available)"
+      ],
+      "note": "Escalation is only allowed if a clinician is available in the same step.",
+      "approximate": false
+    }
+  ]
+}

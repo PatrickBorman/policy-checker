@@ -1,0 +1,41 @@
+name: trading_agent_guard
+description: >
+  Pre-trade controls for an autonomous trading agent: limits, market halts, risk-officer approval, queueing.
+provenance: modelled on pre-trade risk-control policies
+env:
+  - {name: req_trade, desc: the agent proposes a trade}
+  - {name: over_limit, desc: the trade exceeds the position limit}
+  - {name: market_halt, desc: trading in the instrument is halted}
+  - {name: officer_ok, desc: the risk officer approved this trade this step}
+sys:
+  - {name: execute, desc: send the order}
+  - {name: reject, desc: refuse the order}
+  - {name: queue, desc: hold the order for the next step}
+rules:
+  - id: G1
+    kind: guarantee
+    text: Every proposal gets exactly one of execute, reject or queue in the same step; nothing without a proposal.
+    spectra:
+      - "G (req_trade -> (execute | reject | queue))"
+      - "G (!(execute & reject) & !(execute & queue) & !(reject & queue))"
+      - "G (!req_trade -> (!execute & !reject & !queue))"
+  - id: G2
+    kind: guarantee
+    text: Never execute during a market halt.
+    spectra: "G (market_halt -> !execute)"
+  - id: G3
+    kind: guarantee
+    text: An over-limit trade is executed only with the risk officer's approval in the same step.
+    spectra: "G ((over_limit & !officer_ok) -> !execute)"
+  - id: G4
+    kind: guarantee
+    text: An order is never queued two steps running.
+    spectra: "G (queue -> !next(queue))"
+  - id: G5
+    kind: guarantee
+    text: Never reject a trade the risk officer has approved.
+    spectra: "G ((req_trade & officer_ok) -> !reject)"
+  - id: A1
+    kind: assumption
+    text: A queued order is re-proposed in the next step.
+    spectra: "G (queue -> next(req_trade))"

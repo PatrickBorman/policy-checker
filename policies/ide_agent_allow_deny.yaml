@@ -1,0 +1,37 @@
+name: ide_agent_allow_deny
+description: >
+  Permission rules for an IDE coding agent: allow-list, deny-list, ask-by-default, with user approval.
+provenance: modelled on IDE agent permission settings (allow / deny / ask rules and per-request approval)
+env:
+  - {name: req, desc: the agent requests an action this step}
+  - {name: matches_allow, desc: the action matches an allow rule}
+  - {name: matches_deny, desc: the action matches a deny rule}
+  - {name: user_approved, desc: the user approved the pending request this step}
+sys:
+  - {name: allow, desc: the action runs}
+  - {name: deny, desc: the action is refused}
+  - {name: ask, desc: the user is prompted}
+rules:
+  - id: G1
+    kind: guarantee
+    text: Each request gets exactly one of allow, deny or ask in the same step; nothing without a request.
+    spectra:
+      - "G (req -> (allow | deny | ask))"
+      - "G (!(allow & deny) & !(allow & ask) & !(deny & ask))"
+      - "G (!req -> (!allow & !deny & !ask))"
+  - id: G2
+    kind: guarantee
+    text: Deny rules take precedence - an action matching a deny rule is never allowed and never asked about.
+    spectra: "G ((req & matches_deny) -> deny)"
+  - id: G3
+    kind: guarantee
+    text: An action matching an allow rule and no deny rule runs without asking.
+    spectra: "G ((req & matches_allow & !matches_deny) -> allow)"
+  - id: G4
+    kind: guarantee
+    text: An action the user approved always runs.
+    spectra: "G ((req & user_approved) -> allow)"
+  - id: A1
+    kind: assumption
+    text: The user only approves a live request.
+    spectra: "G (user_approved -> req)"

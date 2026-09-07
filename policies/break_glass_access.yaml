@@ -1,0 +1,36 @@
+name: break_glass_access
+description: >
+  Elevated-permission requests from an agent: least-privilege approval, with an emergency (break-glass) path.
+provenance: modelled on enterprise privileged-access policies with a break-glass clause
+env:
+  - {name: req_elevated, desc: the agent requests elevated permissions this step}
+  - {name: approved, desc: an approver granted the request this step}
+  - {name: emergency, desc: an emergency is declared}
+sys:
+  - {name: grant, desc: grant the elevated permission}
+  - {name: deny, desc: refuse}
+  - {name: hold, desc: keep the request pending}
+rules:
+  - id: G1
+    kind: guarantee
+    text: Every request gets exactly one of grant, deny or hold in the same step; no decision without a request.
+    spectra:
+      - "G (req_elevated -> (grant | deny | hold))"
+      - "G (!(grant & deny) & !(grant & hold) & !(deny & hold))"
+      - "G (!req_elevated -> (!grant & !deny & !hold))"
+  - id: G2
+    kind: guarantee
+    text: Elevated permissions are granted only with an approval in the same step (least privilege).
+    spectra: "G (!approved -> !grant)"
+  - id: G3
+    kind: guarantee
+    text: In an emergency, elevated access is granted immediately (break-glass).
+    spectra: "G ((req_elevated & emergency) -> grant)"
+  - id: G4
+    kind: guarantee
+    text: A request is never held for two consecutive steps.
+    spectra: "G (hold -> !next(hold))"
+  - id: A1
+    kind: assumption
+    text: Approvals only arrive for a live request.
+    spectra: "G (approved -> req_elevated)"

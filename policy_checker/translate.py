@@ -33,6 +33,11 @@ controller strategy exists that satisfies every rule no matter what the environm
     * justice (liveness): `GF ( ... )` holds infinitely often
 - Assumptions must not contain `next()` of a sys variable. Guarantees may use `next()` of any variable.
 - "In the same step" needs no temporal operator: `G (req -> (allow | block))`.
+- A rule about how a request is handled ("when the kill switch is on, every call is denied", "flagged outputs
+  are audited") applies only in steps where there IS a request/output. Put the request variable in the
+  antecedent: `G ((req & kill_switch) -> deny)`, not `G (kill_switch -> deny)` - the latter forces a decision
+  in steps with nothing to decide and manufactures a conflict with the "nothing without a request" rule.
+  Prohibitions ("never allow X") are fine without it: `G (kill_switch -> !allow)`.
 - "Never X after Y" / "not twice in a row": use next(): `G (escalate -> !next(escalate))`.
 - "Eventually" / "infinitely often": `GF (...)`. There are no bounded-time operators ("within 3 steps") and no
   new state variables: encode the closest GR(1) meaning and set approximate=true with a note.
@@ -46,6 +51,8 @@ Be literal. Do not add rules that are not stated. Do not "fix" contradictions be
 them is the point.
 
 # Example
+(In this example note R2 is a prohibition, so no `req_pay` is needed in its antecedent; a positive obligation
+like "high-value payments are rejected" would be `G ((req_pay & amount_high & !manager_ok) -> reject)`.)
 Variables: env: req_pay (the agent proposes a payment), amount_high (the amount is above the limit),
 manager_ok (a manager approved this step). sys: approve, reject.
 Rules:
@@ -157,6 +164,7 @@ def make_client():
 
 
 GEMINI_MODEL = "gemini-3.5-flash"   # free tier; 2.5-pro has a free-tier limit of 0
+GEMINI_FALLBACKS = ["gemini-3.5-flash", "gemini-2.5-flash", "gemini-3.1-flash-lite", "gemini-2.5-flash-lite"]
 
 
 class GeminiClient:
@@ -169,6 +177,27 @@ class GeminiClient:
         self.client = genai.Client()   # reads GEMINI_API_KEY / GOOGLE_API_KEY
 
     def complete(self, messages) -> Translation:
+        """Free-tier daily quotas are small (20/day on 3.5-flash); on a per-day 429 move to the next model."""
+        from google.genai import errors
+        while True:
+            try:
+                return self._complete(messages)
+            except errors.ClientError as e:
+                msg = str(e)
+                if "429" in msg and "PerDay" in msg:
+                    nxt = [m for m in GEMINI_FALLBACKS if m != self.model and GEMINI_FALLBACKS.index(m) > GEMINI_FALLBACKS.index(self.model)] if self.model in GEMINI_FALLBACKS else []
+                    if not nxt:
+                        raise
+                    self.model = nxt[0]
+                    continue
+                if "429" in msg:
+                    import re, time
+                    m = re.search(r"retry in ([\d.]+)s", msg)
+                    time.sleep(min(float(m.group(1)) if m else 20, 65) + 1)
+                    continue
+                raise
+
+    def _complete(self, messages) -> Translation:
         from google.genai import types
         contents = [types.Content(role=("user" if m["role"] == "user" else "model"),
                                   parts=[types.Part.from_text(text=m["content"])]) for m in messages]
