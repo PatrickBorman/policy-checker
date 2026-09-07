@@ -1,0 +1,209 @@
+#!/usr/bin/env python3
+"""Drop-in stand-in for `mathsat -interpolate=<prefix> A B` (MathSAT 4 CLI) on platforms without the binary.
+
+Reads two MathSAT-4-format propositional files (VAR ... : BOOLEAN / FORMULA ...), computes a Craig interpolant
+I for (A, B) and writes it as `<prefix>.1.msat` in the DEFINE/FORMULA syntax that LTL2Boolean.parseInterpolant
+expects. Exits 0 in every case; if A & B is satisfiable no file is written (as MathSAT behaves).
+
+Interpolant: if pysmt has an interpolating solver (MathSAT 5) use it; otherwise the strongest interpolant
+  I = exists(vars in A only). A
+computed on a BDD (the `dd` package). Both are valid Craig interpolants: A -> I, I & B unsat, vars(I) shared.
+"""
+import re
+import sys
+
+TOK = re.compile(r"\s*(?:(<->|->|[()!&|])|([A-Za-z_][A-Za-z0-9_]*))")
+
+
+def read(fn):
+    txt = open(fn).read()
+    m = re.search(r"VAR\s*(.*?):\s*BOOLEAN\s*FORMULA\s*(.*)", txt, re.S)
+    if not m:
+        sys.exit("cannot parse " + fn)
+    vs = [v.strip() for v in m.group(1).split(",") if v.strip()]
+    return vs, m.group(2).strip()
+
+
+class P:
+    def __init__(self, s):
+        self.t = []
+        i = 0
+        while i < len(s):
+            m = TOK.match(s, i)
+            if not m or m.end() == i:
+                sys.exit("tokenise error at %r" % s[i:i + 20])
+            self.t.append(m.group(1) or m.group(2)); i = m.end()
+        self.i = 0
+
+    def peek(self):
+        return self.t[self.i] if self.i < len(self.t) else None
+
+    def eat(self, x=None):
+        v = self.peek()
+        if x is not None and v != x:
+            sys.exit("expected %r got %r" % (x, v))
+        self.i += 1
+        return v
+
+    def iff(self):
+        l = self.imp()
+        while self.peek() == "<->":
+            self.eat(); l = ("iff", l, self.imp())
+        return l
+
+    def imp(self):
+        l = self.disj()
+        if self.peek() == "->":
+            self.eat(); return ("imp", l, self.imp())
+        return l
+
+    def disj(self):
+        l = self.conj()
+        while self.peek() == "|":
+            self.eat(); l = ("or", l, self.conj())
+        return l
+
+    def conj(self):
+        l = self.un()
+        while self.peek() == "&":
+            self.eat(); l = ("and", l, self.un())
+        return l
+
+    def un(self):
+        v = self.peek()
+        if v == "!":
+            self.eat(); return ("not", self.un())
+        if v == "(":
+            self.eat(); e = self.iff(); self.eat(")"); return e
+        if v in ("TRUE", "true"):
+            self.eat(); return ("const", True)
+        if v in ("FALSE", "false"):
+            self.eat(); return ("const", False)
+        if v is None:
+            sys.exit("unexpected end")
+        self.eat(); return ("var", v)
+
+
+def parse(s):
+    p = P(s); e = p.iff()
+    if p.peek() is not None:
+        sys.exit("trailing tokens %r" % p.t[p.i:])
+    return e
+
+
+def to_bdd(e, bdd):
+    k = e[0]
+    if k == "const":
+        return bdd.true if e[1] else bdd.false
+    if k == "var":
+        return bdd.var(e[1])
+    if k == "not":
+        return ~to_bdd(e[1], bdd)
+    a, b = to_bdd(e[1], bdd), to_bdd(e[2], bdd)
+    if k == "and":
+        return a & b
+    if k == "or":
+        return a | b
+    if k == "imp":
+        return ~a | b
+    if k == "iff":
+        return bdd.apply("equiv", a, b)
+    raise ValueError(k)
+
+
+def bdd_to_str(bdd, u):
+    """Render a BDD as a formula string in the engine's syntax (DNF over the BDD's satisfying paths)."""
+    if u == bdd.true:
+        return "TRUE"
+    if u == bdd.false:
+        return "FALSE"
+    terms = []
+    for cube in bdd.pick_iter(u, care_vars=bdd.support(u)):
+        lits = [("" if val else "!") + v for v, val in sorted(cube.items())]
+        terms.append("(" + " & ".join(lits) + ")" if len(lits) > 1 else lits[0])
+    return " | ".join(terms) if len(terms) > 1 else terms[0]
+
+
+def interpolant_bdd(varsA, fA, varsB, fB):
+    from dd.autoref import BDD
+    bdd = BDD()
+    allv = sorted(set(varsA) | set(varsB))
+    bdd.declare(*allv)
+    A = to_bdd(parse(fA), bdd)
+    B = to_bdd(parse(fB), bdd)
+    if (A & B) != bdd.false:
+        return None                      # A & B satisfiable: no interpolant
+    a_only = [v for v in bdd.support(A) if v not in set(varsB)]
+    I = bdd.exist(a_only, A) if a_only else A
+    return bdd_to_str(bdd, weaken(bdd, I, B))
+
+
+def weaken(bdd, I, B):
+    """Weaken the strongest interpolant I (a DNF of cubes) by greedily dropping literals from each cube while
+    I' & B stays unsat. I -> I' so A -> I' still holds; the vocabulary only shrinks. This mimics the small,
+    relevant interpolants a proof-based interpolator returns instead of the full path valuation."""
+    if I in (bdd.true, bdd.false):
+        return I
+    cubes = list(bdd.pick_iter(I, care_vars=bdd.support(I)))
+    result = bdd.false
+    for cube in cubes:
+        lits = dict(cube)
+        others = result
+        for v in sorted(lits):
+            trial = dict(lits); del trial[v]
+            cand = others | bdd.cube(trial) if trial else bdd.true
+            if (cand & B) == bdd.false:
+                lits = trial
+        result = others | (bdd.cube(lits) if lits else bdd.true)
+    return result
+
+
+def interpolant_msat(varsA, fA, varsB, fB):
+    try:
+        from pysmt.shortcuts import Symbol, And, Or, Not, Iff, Implies, TRUE, FALSE, binary_interpolant
+        from pysmt.exceptions import NoSolverAvailableError
+    except ImportError:
+        return "unavailable"
+
+    def conv(e):
+        k = e[0]
+        if k == "const": return TRUE() if e[1] else FALSE()
+        if k == "var": return Symbol(e[1])
+        if k == "not": return Not(conv(e[1]))
+        a, b = conv(e[1]), conv(e[2])
+        return {"and": And, "or": Or, "imp": Implies, "iff": Iff}[k](a, b)
+
+    try:
+        I = binary_interpolant(conv(parse(fA)), conv(parse(fB)), solver_name="msat")
+    except NoSolverAvailableError:
+        return "unavailable"
+    if I is None:
+        return None
+    return I.serialize().replace("True", "TRUE").replace("False", "FALSE")
+
+
+def main():
+    args = sys.argv[1:]
+    prefix = None
+    files = []
+    for a in args:
+        if a.startswith("-interpolate="):
+            prefix = a.split("=", 1)[1]
+        elif not a.startswith("-"):
+            files.append(a)
+    if prefix is None or len(files) != 2:
+        sys.exit("usage: mathsat -interpolate=<prefix> A B")
+    varsA, fA = read(files[0]); varsB, fB = read(files[1])
+    I = interpolant_msat(varsA, fA, varsB, fB)
+    if I == "unavailable":
+        I = interpolant_bdd(varsA, fA, varsB, fB)
+    if I is None:
+        print("sat")           # no interpolant, as MathSAT reports
+        return
+    with open(prefix + ".1.msat", "w") as f:
+        f.write("FORMULA " + I + "\n")
+    print("unsat")
+
+
+if __name__ == "__main__":
+    main()

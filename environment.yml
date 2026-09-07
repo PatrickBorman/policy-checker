@@ -1,0 +1,18 @@
+# conda env create -f environment.yml && conda activate policy-checker
+name: policy-checker
+channels: [conda-forge]
+dependencies:
+  - python=3.10
+  - openjdk=22
+  - numpy
+  - pyparsing
+  - pyyaml
+  - pydantic
+  - pip
+  - pip:
+      - jpype1
+      - dd
+      - tarjan
+      - anthropic
+      - google-genai
+      - pysmt

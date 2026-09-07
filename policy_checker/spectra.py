@@ -11,12 +11,32 @@ from typing import Dict, List, Optional
 
 HERE = Path(__file__).resolve().parent.parent
 
-# Locations. Override with env vars if the layout differs.
-JAVA = os.environ.get("POLICY_CHECKER_JAVA",
-                      "/usr/local/Cellar/openjdk/22.0.2/libexec/openjdk.jdk/Contents/Home/bin/java")
-SPECTRA_DIR = Path(os.environ.get("POLICY_CHECKER_SPECTRA_DIR",
-                                  Path.home() / "Documents/interpolation-repair/interpolation-repair/spectra"))
-CUDD_DIR = Path(os.environ.get("POLICY_CHECKER_CUDD_DIR", Path.home() / "amba-fix"))   # libcudd.dylib
+# Locations. Everything needed is vendored under the repo; override with env vars if the layout differs.
+import shutil
+
+
+def _find_java() -> str:
+    if os.environ.get("POLICY_CHECKER_JAVA"):
+        return os.environ["POLICY_CHECKER_JAVA"]
+    if os.environ.get("JAVA_HOME"):
+        return str(Path(os.environ["JAVA_HOME"]) / "bin/java")
+    import subprocess as sp
+    for cand in (shutil.which("java"),
+                 "/opt/homebrew/opt/openjdk/bin/java", "/usr/local/opt/openjdk/bin/java",
+                 "/usr/local/Cellar/openjdk/22.0.2/libexec/openjdk.jdk/Contents/Home/bin/java"):
+        # macOS ships a /usr/bin/java stub that only prints "Unable to locate a Java Runtime"; test-run each candidate
+        if cand and Path(cand).exists():
+            try:
+                if sp.run([cand, "-version"], capture_output=True, timeout=20).returncode == 0:
+                    return cand
+            except Exception:
+                pass
+    return "java"
+
+
+JAVA = _find_java()
+SPECTRA_DIR = Path(os.environ.get("POLICY_CHECKER_SPECTRA_DIR", HERE / "vendor/spectra"))
+CUDD_DIR = Path(os.environ.get("POLICY_CHECKER_CUDD_DIR", SPECTRA_DIR))   # libcudd.dylib / libcudd.so
 CLASSPATH = f"{HERE / 'java/out'}:{SPECTRA_DIR / 'SpectraTool.jar'}:{SPECTRA_DIR / 'dependencies'}/*"
 
 NOISE = re.compile(r"^(lookup, class|Could not load BDD|Using BDD Package|There are no core|extract strategy|rabin game not|getRabin)")

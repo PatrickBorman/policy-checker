@@ -13,10 +13,29 @@ import subprocess
 from pathlib import Path
 from typing import Optional
 
-ENGINE_DIR = Path(os.environ.get("POLICY_CHECKER_ENGINE_DIR",
-                                 Path.home() / "Documents/interpolation-repair/interpolation-repair"))
-PY38 = Path(os.environ.get("POLICY_CHECKER_PY38", "/opt/anaconda3/envs/py38/bin/python"))
+HERE = Path(__file__).resolve().parent.parent
+ENGINE_DIR = Path(os.environ.get("POLICY_CHECKER_ENGINE_DIR", HERE / "engine"))
 MATHSAT = ENGINE_DIR / "MathSAT4/mathsat-4.2.17-linux-x86_64/bin/mathsat"
+
+
+def _find_python() -> Path:
+    """Interpreter with jpype + dd + numpy + pyparsing for the engine. POLICY_CHECKER_PYTHON, else the conda env
+    from environment.yml, else the current interpreter if it can import jpype."""
+    import sys, subprocess as sp
+    if os.environ.get("POLICY_CHECKER_PYTHON"):
+        return Path(os.environ["POLICY_CHECKER_PYTHON"])
+    for cand in (Path(os.environ.get("CONDA_PREFIX", "")) / "bin/python" if os.environ.get("CONDA_PREFIX") else None,
+                 Path(sys.executable)):
+        if cand and cand.exists() and sp.run([str(cand), "-c", "import jpype, dd, numpy, pyparsing"], capture_output=True).returncode == 0:
+            return cand
+    for cand in ("/opt/anaconda3/envs/policy-checker/bin/python", Path.home() / "miniconda3/envs/policy-checker/bin/python",
+                 "/opt/anaconda3/envs/py38/bin/python"):
+        if Path(cand).exists():
+            return Path(cand)
+    return Path(sys.executable)
+
+
+PY38 = _find_python()
 
 
 def available() -> Optional[str]:
@@ -24,7 +43,7 @@ def available() -> Optional[str]:
     if not ENGINE_DIR.exists():
         return f"engine not found at {ENGINE_DIR}"
     if not PY38.exists():
-        return f"py38 interpreter not found at {PY38}"
+        return f"engine interpreter not found at {PY38} (create it: conda env create -f environment.yml)"
     if not MATHSAT.exists():
         return f"MathSAT (or the BDD stand-in) not found at {MATHSAT}"
     return None
@@ -41,8 +60,12 @@ def run(spec: Path, out_dir: Path, timeout_min: float = 2.0, repair_limit: int =
     cmd = [str(PY38), "interpolation_repair.py", "-i", str(spec.resolve()), "-o", str(out_dir.resolve()),
            "-t", str(timeout_min), "-rl", str(repair_limit), "-min", "-inf"]
     env = dict(os.environ)
-    cudd = os.environ.get("POLICY_CHECKER_CUDD_DIR", str(Path.home() / "amba-fix"))
+    from .spectra import CUDD_DIR
+    cudd = str(CUDD_DIR)
     env["JAVA_TOOL_OPTIONS"] = (env.get("JAVA_TOOL_OPTIONS", "") + f" -Djava.library.path={cudd}").strip()
+    env["PATH"] = f"{PY38.parent}:" + env.get("PATH", "")     # the MathSAT stand-in runs under the same interpreter
+    if os.environ.get("JAVA_HOME"):
+        env["JAVA_HOME"] = os.environ["JAVA_HOME"]
     import csv, io, time
     out_dir.mkdir(parents=True, exist_ok=True)   # the engine hangs if the output folder is missing
     t0 = time.time()
