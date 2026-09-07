@@ -25,8 +25,10 @@ def check_one(path: Path, out_dir: Path, use_llm: bool, model: str, timeout: int
 
     t0 = time.time()
     if use_llm:
-        from .translate import translate, to_constraints
-        tr = translate(ps, model=model)
+        from .translate import translate, to_constraints, make_client, GeminiClient
+        client = make_client()
+        res["translator"] = client.model if isinstance(client, GeminiClient) else model
+        tr = translate(ps, client=client, model=model)
         (out_dir / f"{ps.name}.translation.json").write_text(json.dumps(tr.model_dump(), indent=2))
         constraints = to_constraints(tr)
         res["approximate_rules"] = [t.id for t in tr.rules if t.approximate]
@@ -87,7 +89,7 @@ def check_one(path: Path, out_dir: Path, use_llm: bool, model: str, timeout: int
 
 
 def render(res: dict, ps_desc: str = "") -> str:
-    L = [f"# {res['policy_set']}  ({res['mode']}, {res['rules']} rules)"]
+    L = [f"# {res['policy_set']}  ({res['mode']}" + (f" via {res['translator']}" if res.get('translator') else "") + f", {res['rules']} rules)"]
     if "error" in res:
         return "\n".join(L + [f"ERROR: {res['error']}"])
     if res.get("approximate_rules"):

@@ -134,25 +134,82 @@ def _next_vars(e, inside=False):
     return out
 
 
-def translate(ps: PolicySet, client=None, model: str = MODEL, effort: str = "high", retries: int = 1) -> Translation:
-    """Call Claude. On validation problems, feed them back once and retry."""
+def make_client():
+    """Anthropic API if ANTHROPIC_API_KEY is set; otherwise Claude on Vertex AI (Google Cloud credits).
+
+    Vertex needs: `gcloud auth application-default login`, GOOGLE_CLOUD_PROJECT (or POLICY_CHECKER_GCP_PROJECT),
+    and the Claude models enabled in Vertex Model Garden. Region defaults to "global".
+    """
+    import os
     import anthropic
-    client = client or anthropic.Anthropic()
+    provider = os.environ.get("POLICY_CHECKER_PROVIDER")
+    if provider == "anthropic" or (provider is None and os.environ.get("ANTHROPIC_API_KEY")):
+        return anthropic.Anthropic()
+    if provider == "gemini" or (provider is None and (os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY"))):
+        return GeminiClient()
+    project = os.environ.get("POLICY_CHECKER_GCP_PROJECT") or os.environ.get("GOOGLE_CLOUD_PROJECT") or os.environ.get("ANTHROPIC_VERTEX_PROJECT_ID")
+    if not project:
+        raise RuntimeError("no credentials: set ANTHROPIC_API_KEY, or for Vertex set GOOGLE_CLOUD_PROJECT and run "
+                           "`gcloud auth application-default login`")
+    region = os.environ.get("CLOUD_ML_REGION", "global")
+    from anthropic import AnthropicVertex
+    return AnthropicVertex(project_id=project, region=region)
+
+
+GEMINI_MODEL = "gemini-2.5-pro"
+
+
+class GeminiClient:
+    """Same job as the Claude call, on the Gemini API (free tier is enough for this). Structured JSON output."""
+
+    def __init__(self, model: str = None):
+        import os
+        from google import genai
+        self.model = model or os.environ.get("POLICY_CHECKER_GEMINI_MODEL", GEMINI_MODEL)
+        self.client = genai.Client()   # reads GEMINI_API_KEY / GOOGLE_API_KEY
+
+    def complete(self, messages) -> Translation:
+        from google.genai import types
+        contents = [types.Content(role=("user" if m["role"] == "user" else "model"),
+                                  parts=[types.Part.from_text(text=m["content"])]) for m in messages]
+        resp = self.client.models.generate_content(
+            model=self.model,
+            contents=contents,
+            config=types.GenerateContentConfig(
+                system_instruction=SYSTEM,
+                response_mime_type="application/json",
+                response_schema=Translation,
+                temperature=0,
+            ),
+        )
+        return Translation.model_validate_json(resp.text)
+
+
+def _complete_claude(client, messages, model, effort) -> Translation:
+    resp = client.messages.parse(
+        model=model,
+        max_tokens=16000,
+        system=[{"type": "text", "text": SYSTEM, "cache_control": {"type": "ephemeral"}}],
+        messages=messages,
+        thinking={"type": "adaptive"},
+        output_config={"effort": effort},
+        output_format=Translation,
+    )
+    if resp.stop_reason == "refusal":
+        raise RuntimeError(f"model refused: {getattr(resp, 'stop_details', None)}")
+    return resp.parsed_output
+
+
+def translate(ps: PolicySet, client=None, model: str = MODEL, effort: str = "high", retries: int = 1) -> Translation:
+    """Translate with whichever LLM is configured. On validation problems, feed them back once and retry."""
+    client = client or make_client()
     messages = [{"role": "user", "content": _prompt(ps)}]
     last = None
     for attempt in range(retries + 1):
-        resp = client.messages.parse(
-            model=model,
-            max_tokens=16000,
-            system=[{"type": "text", "text": SYSTEM, "cache_control": {"type": "ephemeral"}}],
-            messages=messages,
-            thinking={"type": "adaptive"},
-            output_config={"effort": effort},
-            output_format=Translation,
-        )
-        if resp.stop_reason == "refusal":
-            raise RuntimeError(f"model refused: {getattr(resp, 'stop_details', None)}")
-        tr: Translation = resp.parsed_output
+        if isinstance(client, GeminiClient):
+            tr = client.complete(messages)
+        else:
+            tr = _complete_claude(client, messages, model, effort)
         last = tr
         problems = validate(ps, tr)
         if not problems:
