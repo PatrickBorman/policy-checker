@@ -1,0 +1,18 @@
+[
+  {
+    "policy_set": "cc_permissions_literal",
+    "source": "policies_claudecode/cc_permissions_literal.yaml",
+    "mode": "manual",
+    "rules": 21,
+    "t_translate_s": 0.0,
+    "spectra": "out_cc/cc_permissions_literal.manual.spectra",
+    "realizable": false,
+    "t_check_s": 2.08,
+    "y_sat": true,
+    "core_rules": [
+      "A2",
+      "A3"
+    ],
+    "counter_trace": "step 0:  environment: m_bypass, bypass_avail, hook_allow, mcp_interact    [not: m_default, m_accept, m_plan, m_auto, m_dontask, auto_avail, deny_rule, ask_rule, bare_ask, allow_rule, hook_block, hook_deny, hook_ask, readonly, is_edit, is_bash, sandboxed, critical_rm, protected_write, end_conv, classifier_ok]\n         controller:  no response satisfies every rule:\n             (nothing)    [not: proceed]              violates H2\n             proceed                                  violates ?"
+  }
+]

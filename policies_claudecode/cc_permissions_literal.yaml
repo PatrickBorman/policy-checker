@@ -1,0 +1,163 @@
+name: cc_permissions_literal
+description: >
+  Claude Code's permission decision for a single tool call, encoded sentence-by-sentence from the documentation
+  ("Configure permissions" and "Choose a permission mode", code.claude.com/docs, fetched 7 Sep 2026). TIER A: each
+  rule is literal to its sentence, qualified only by what the same passage says. Conflicts found here are then
+  checked against the rest of the docs. Environment = the call and the configuration; system = the decision.
+provenance: code.claude.com/docs/en/permissions and /permission-modes, verbatim passages in sources/claude_code_*.txt; rule ids cite [perm] or [modes] + the sentence
+env:
+  - {name: m_default, desc: mode is default (Manual)}
+  - {name: m_accept, desc: mode is acceptEdits}
+  - {name: m_plan, desc: mode is plan}
+  - {name: m_auto, desc: mode is auto}
+  - {name: m_dontask, desc: mode is dontAsk}
+  - {name: m_bypass, desc: mode is bypassPermissions}
+  - {name: bypass_avail, desc: bypassPermissions is in the session's mode cycle (matters in plan mode)}
+  - {name: auto_avail, desc: auto mode is available in the session (matters in plan mode)}
+  - {name: deny_rule, desc: the call matches a deny rule}
+  - {name: ask_rule, desc: the call matches a content-scoped ask rule}
+  - {name: bare_ask, desc: the call is Bash and a bare Bash ask rule is configured}
+  - {name: allow_rule, desc: the call matches an allow rule}
+  - {name: hook_block, desc: a PreToolUse hook exited with code 2}
+  - {name: hook_deny, desc: a PreToolUse hook returned deny}
+  - {name: hook_ask, desc: a PreToolUse hook returned ask}
+  - {name: hook_allow, desc: a PreToolUse hook returned allow}
+  - {name: readonly, desc: a read-only tool use within the working directories, or a built-in read-only Bash command}
+  - {name: is_edit, desc: a file modification in the working directories}
+  - {name: is_bash, desc: a Bash command that is not built-in read-only}
+  - {name: sandboxed, desc: the Bash command runs sandboxed with autoAllowBashIfSandboxed at its default}
+  - {name: critical_rm, desc: an rm/rmdir targeting a critical path}
+  - {name: protected_write, desc: a write to a protected path}
+  - {name: mcp_interact, desc: AskUserQuestion, an MCP tool marked requiresUserInteraction, or a connector tool the org set to ask}
+  - {name: end_conv, desc: the EndConversation tool while at least one other tool remains}
+  - {name: classifier_ok, desc: the auto-mode classifier approves the action}
+sys:
+  - {name: proceed, desc: the call runs}
+  - {name: prompt, desc: the user is asked}
+  - {name: block, desc: the call is denied}
+extra:
+  - {kind: guarantee, spectra: "G ((proceed | prompt | block) & !(proceed & prompt) & !(proceed & block) & !(prompt & block))", note: one decision per call}
+  - {kind: assumption, spectra: "G ((m_default | m_accept | m_plan | m_auto | m_dontask | m_bypass) & !(m_default & m_accept) & !(m_default & m_plan) & !(m_default & m_auto) & !(m_default & m_dontask) & !(m_default & m_bypass) & !(m_accept & m_plan) & !(m_accept & m_auto) & !(m_accept & m_dontask) & !(m_accept & m_bypass) & !(m_plan & m_auto) & !(m_plan & m_dontask) & !(m_plan & m_bypass) & !(m_auto & m_dontask) & !(m_auto & m_bypass) & !(m_dontask & m_bypass))", note: exactly one mode}
+  - {kind: assumption, spectra: "G (!(readonly & is_edit) & !(readonly & is_bash) & !(is_edit & is_bash) & !(mcp_interact & is_bash) & !(mcp_interact & is_edit) & !(mcp_interact & readonly) & !(end_conv & is_bash) & !(end_conv & is_edit) & !(end_conv & readonly) & !(end_conv & mcp_interact))", note: one kind of call}
+  - {kind: assumption, spectra: "G ((critical_rm -> is_bash) & (sandboxed -> is_bash) & (bare_ask -> is_bash) & (protected_write -> is_edit) & (m_bypass -> bypass_avail))", note: domain facts}
+  - {kind: assumption, spectra: "G (!(hook_block & hook_allow) & !(hook_deny & hook_allow) & !(hook_ask & hook_allow) & !(hook_block & hook_deny) & !(hook_block & hook_ask) & !(hook_deny & hook_ask))", note: one hook verdict}
+rules:
+  - id: H1
+    kind: guarantee
+    text: "[perm] A hook that exits with code 2 stops the tool call before permission rules are evaluated, so the block applies even when an allow rule would otherwise let the call proceed."
+    spectra: "G (hook_block -> block)"
+  - id: H2
+    kind: guarantee
+    text: "[perm] The hook output can deny the tool call, force a prompt, or skip the prompt to let the call proceed."
+    spectra:
+      - "G (hook_deny -> block)"
+      - "G (hook_ask -> prompt)"
+      - "G ((hook_allow & !deny_rule & !ask_rule & !critical_rm) -> proceed)"
+  - id: H3
+    kind: guarantee
+    text: "[perm] Hook decisions don't bypass permission rules: a matching deny rule blocks the call, and a matching ask rule still prompts even when the hook returned allow or ask."
+    spectra:
+      - "G ((hook_allow & deny_rule) -> block)"
+      - "G ((hook_allow & ask_rule) -> prompt)"
+  - id: D1
+    kind: guarantee
+    text: "[modes] Deny rules block in every mode, including bypassPermissions. Deny and ask rules don't apply to EndConversation as long as Claude still has at least one other tool."
+    spectra: "G ((deny_rule & !end_conv) -> block)"
+  - id: A1
+    kind: guarantee
+    text: "[perm] Ask rules prompt for confirmation whenever Claude Code tries to use the specified tool. [modes] Tools matched by an explicit ask rule are never auto-approved in any mode, including bypassPermissions; they still prompt in that mode. [dontAsk] Claude Code denies calls matching your explicit ask rules rather than prompting."
+    spectra:
+      - "G ((ask_rule & !end_conv & !m_dontask) -> prompt)"
+      - "G ((ask_rule & !end_conv & m_dontask) -> block)"
+  - id: A2
+    kind: guarantee
+    text: "[modes] Tools matched by an explicit ask rule are never auto-approved in any mode."
+    spectra: "G ((bare_ask & !end_conv) -> !proceed)"
+  - id: A3
+    kind: guarantee
+    text: "[perm, sandbox] When you enable sandboxing and leave autoAllowBashIfSandboxed at its default of true, sandboxed Bash commands run without prompting even if your permissions include a bare Bash ask rule; in plan mode Claude Code skips this substitution. Content-scoped ask rules still force a prompt; explicit deny rules still apply; critical-path rm still goes through the regular flow."
+    spectra: "G ((sandboxed & bare_ask & !ask_rule & !deny_rule & !critical_rm & !m_plan & !hook_block & !hook_deny & !hook_ask) -> proceed)"
+  - id: E1
+    kind: guarantee
+    text: "[perm] A deny rule can't remove EndConversation while any other tool remains, and an ask rule never prompts for it."
+    spectra: "G ((end_conv & !hook_block & !hook_deny) -> !prompt)"
+  - id: R1
+    kind: guarantee
+    text: "[perm, table] Read-only tools within the working directories need no approval; built-in read-only Bash commands need no approval."
+    spectra: "G ((readonly & !deny_rule & !ask_rule & !hook_block & !hook_deny & !hook_ask & !m_dontask) -> proceed)"
+  - id: R2
+    kind: guarantee
+    text: "[modes dontAsk] Claude runs only actions matching your permissions.allow rules, read-only Bash commands, and calls approved by a PreToolUse hook; it auto-denies every tool call that would otherwise prompt you; the session never waits for input."
+    spectra:
+      - "G (m_dontask -> !prompt)"
+      - "G ((m_dontask & !allow_rule & !readonly & !hook_allow) -> block)"
+      - "G ((m_dontask & (allow_rule | readonly | hook_allow) & !deny_rule & !mcp_interact & !critical_rm & !protected_write & !ask_rule & !hook_block & !hook_deny & !hook_ask) -> proceed)"
+  - id: R3
+    kind: guarantee
+    text: "[modes dontAsk] It denies AskUserQuestion even if your allow rules match it, connector tools the org set to ask, and MCP tools marked requiresUserInteraction. Critical-path removals are denied even when an allow rule matches or a hook allows them."
+    spectra:
+      - "G ((m_dontask & mcp_interact) -> block)"
+      - "G ((m_dontask & critical_rm) -> block)"
+  - id: B1
+    kind: guarantee
+    text: "[modes bypass] bypassPermissions disables permission prompts and safety checks so tool calls execute immediately, including writes to protected paths. The actions no mode auto-approves still prompt in this mode. Allow rules have no effect in bypassPermissions."
+    spectra:
+      - "G ((m_bypass & !ask_rule & !mcp_interact & !critical_rm & !deny_rule & !hook_block & !hook_deny) -> proceed)"
+      - "G ((m_bypass & (mcp_interact | critical_rm) & !deny_rule & !hook_block & !hook_deny) -> prompt)"
+  - id: N1
+    kind: guarantee
+    text: "[modes] Actions no mode auto-approves: connector tools set to ask and tools that require user interaction. In auto mode they prompt you directly even when an allow rule matches and never reach the classifier."
+    spectra:
+      - "G ((mcp_interact & !m_dontask & !deny_rule & !hook_block & !hook_deny) -> prompt)"
+  - id: C1
+    kind: guarantee
+    text: "[modes, critical paths] Claude Code never lets an allow rule or a hook allow approve an rm targeting a critical path. default/acceptEdits: asks you; plan: asks you, or with auto available and no bypass available sends it to the classifier; auto: classifier; dontAsk: denies; bypassPermissions: asks you. If an explicit ask rule matches, asks even in auto. A matching deny rule still blocks."
+    spectra:
+      - "G ((critical_rm & (m_default | m_accept | m_bypass) & !deny_rule & !hook_block & !hook_deny) -> prompt)"
+      - "G ((critical_rm & m_plan & !(auto_avail & !bypass_avail) & !deny_rule & !hook_block & !hook_deny) -> prompt)"
+      - "G ((critical_rm & m_plan & auto_avail & !bypass_avail & !ask_rule & !deny_rule & !hook_block & !hook_deny) -> (proceed <-> classifier_ok))"
+      - "G ((critical_rm & m_auto & !ask_rule & !deny_rule & !hook_block & !hook_deny) -> (proceed <-> classifier_ok))"
+      - "G ((critical_rm & m_auto & ask_rule) -> prompt)"
+  - id: P1
+    kind: guarantee
+    text: "[modes, protected paths] Writes to protected paths are never auto-approved except in bypassPermissions and in plan sessions with bypass available. default/acceptEdits: prompted; plan: allowed with bypass available, otherwise routed to the classifier when auto is available and prompted when it isn't; auto: routed to the classifier; dontAsk: denied; bypassPermissions: allowed."
+    spectra:
+      - "G ((protected_write & (m_default | m_accept) & !deny_rule & !hook_block & !hook_deny) -> prompt)"
+      - "G ((protected_write & m_plan & bypass_avail & !deny_rule & !hook_block & !hook_deny & !ask_rule) -> proceed)"
+      - "G ((protected_write & m_plan & !bypass_avail & auto_avail & !deny_rule & !hook_block & !hook_deny & !ask_rule) -> (proceed <-> classifier_ok))"
+      - "G ((protected_write & m_plan & !bypass_avail & !auto_avail & !deny_rule & !hook_block & !hook_deny) -> prompt)"
+      - "G ((protected_write & m_auto & !deny_rule & !hook_block & !hook_deny & !ask_rule) -> (proceed <-> classifier_ok))"
+      - "G ((protected_write & m_dontask) -> block)"
+      - "G ((protected_write & m_bypass & !deny_rule & !hook_block & !hook_deny & !ask_rule) -> proceed)"
+  - id: L1
+    kind: guarantee
+    text: "[modes plan] Except in sessions with bypass permissions available, edits stay blocked until you approve the plan. In sessions with bypass available, a file edit or shell command attempted during planning runs without prompting; explicit ask rules and critical-path removals still prompt."
+    spectra:
+      - "G ((m_plan & is_edit & !bypass_avail) -> block)"
+      - "G ((m_plan & bypass_avail & (is_edit | is_bash) & !ask_rule & !critical_rm & !deny_rule & !hook_block & !hook_deny & !hook_ask & !protected_write) -> proceed)"
+  - id: L2
+    kind: guarantee
+    text: "[modes plan] When auto mode is available the classifier reviews shell commands during planning instead of prompting you: approved commands run and rejected ones are blocked. Otherwise, commands outside the built-in read-only set prompt for approval, including when the sandbox's auto-allow mode is enabled."
+    spectra:
+      - "G ((m_plan & is_bash & !bypass_avail & auto_avail & !critical_rm & !ask_rule & !deny_rule & !hook_block & !hook_deny & !hook_ask) -> (proceed <-> classifier_ok))"
+      - "G ((m_plan & is_bash & !bypass_avail & !auto_avail & !critical_rm & !deny_rule & !hook_block & !hook_deny) -> prompt)"
+  - id: U1
+    kind: guarantee
+    text: "[modes auto] Fixed decision order: (1) actions matching allow, ask or deny rules resolve immediately, except protected-path writes and critical-path removals route to the classifier even when an allow rule matches, and requiresUserInteraction/connector-ask tools prompt directly; (2) read-only actions and file edits in the working directory are auto-approved except protected-path writes; (3) everything else goes to the classifier; (4) if the classifier blocks, Claude receives the reason."
+    spectra:
+      - "G ((m_auto & allow_rule & !protected_write & !critical_rm & !mcp_interact & !ask_rule & !deny_rule & !hook_block & !hook_deny & !hook_ask) -> proceed)"
+      - "G ((m_auto & (readonly | is_edit) & !protected_write & !allow_rule & !ask_rule & !deny_rule & !hook_block & !hook_deny & !hook_ask) -> proceed)"
+      - "G ((m_auto & is_bash & !critical_rm & !allow_rule & !ask_rule & !deny_rule & !hook_block & !hook_deny & !hook_ask) -> (proceed <-> classifier_ok))"
+      - "G ((m_auto & !classifier_ok & is_bash & !allow_rule & !ask_rule & !deny_rule & !hook_block & !hook_deny & !hook_ask & !critical_rm) -> block)"
+  - id: M1
+    kind: guarantee
+    text: "[perm, table] In Manual (default) mode, Bash commands other than built-in read-only ones, file modifications, web fetches and web searches require approval."
+    spectra: "G ((m_default & (is_bash | is_edit) & !allow_rule & !hook_allow & !sandboxed & !deny_rule & !hook_block & !hook_deny) -> prompt)"
+  - id: M2
+    kind: guarantee
+    text: "[perm] Allow rules let Claude Code use the specified tool without manual approval."
+    spectra: "G ((allow_rule & !deny_rule & !ask_rule & !bare_ask & !critical_rm & !protected_write & !mcp_interact & !hook_block & !hook_deny & !hook_ask & !m_dontask & !m_plan & !m_bypass & !m_auto) -> proceed)"
+  - id: K1
+    kind: guarantee
+    text: "[modes acceptEdits] acceptEdits automatically accepts file edits and common filesystem commands for paths in the working directory."
+    spectra: "G ((m_accept & is_edit & !protected_write & !deny_rule & !ask_rule & !hook_block & !hook_deny & !hook_ask) -> proceed)"

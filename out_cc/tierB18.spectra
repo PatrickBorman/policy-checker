@@ -1,0 +1,181 @@
+module cc_permissions_literal
+
+env boolean m_default;
+env boolean m_accept;
+env boolean m_plan;
+env boolean m_auto;
+env boolean m_dontask;
+env boolean m_bypass;
+env boolean bypass_avail;
+env boolean auto_avail;
+env boolean deny_rule;
+env boolean ask_rule;
+env boolean bare_ask;
+env boolean allow_rule;
+env boolean hook_block;
+env boolean hook_deny;
+env boolean hook_ask;
+env boolean hook_allow;
+env boolean readonly;
+env boolean is_edit;
+env boolean is_bash;
+env boolean sandboxed;
+env boolean critical_rm;
+env boolean protected_write;
+env boolean mcp_interact;
+env boolean end_conv;
+env boolean classifier_ok;
+sys boolean proceed;
+sys boolean prompt;
+sys boolean block;
+
+// H1
+guarantee
+	G (hook_block -> block);
+// H2
+guarantee
+	G (hook_deny -> block);
+// H2
+guarantee
+	G ((hook_ask & !m_dontask & !deny_rule & !hook_block) -> prompt);
+// H2
+guarantee
+	G ((hook_ask & m_dontask) -> block);
+// H2
+guarantee
+	G ((hook_allow & !deny_rule & !ask_rule & !critical_rm & !mcp_interact & !protected_write & !(m_plan & is_edit & !bypass_avail)) -> proceed);
+// H3
+guarantee
+	G ((hook_allow & deny_rule) -> block);
+// H3
+guarantee
+	G ((hook_allow & ask_rule & !end_conv & !m_dontask & !deny_rule) -> prompt);
+// D1
+guarantee
+	G ((deny_rule & !end_conv) -> block);
+// A1
+guarantee
+	G ((ask_rule & !end_conv & !m_dontask & !hook_deny & !hook_block & !deny_rule & !(m_plan & is_edit & !bypass_avail & !protected_write)) -> prompt);
+// A1
+guarantee
+	G ((ask_rule & !end_conv & m_dontask) -> block);
+// A3
+guarantee
+	G ((sandboxed & bare_ask & !ask_rule & !deny_rule & !critical_rm & !m_plan & !m_auto & !m_dontask & !hook_block & !hook_deny & !hook_ask) -> proceed);
+// E1
+guarantee
+	G ((end_conv & !hook_block & !hook_deny) -> !prompt);
+// R1
+guarantee
+	G ((readonly & !deny_rule & !ask_rule & !hook_block & !hook_deny & !hook_ask & !m_dontask) -> proceed);
+// R2
+guarantee
+	G (m_dontask -> !prompt);
+// R2
+guarantee
+	G ((m_dontask & !allow_rule & !readonly & !hook_allow) -> block);
+// R2
+guarantee
+	G ((m_dontask & (allow_rule | readonly | hook_allow) & !deny_rule & !mcp_interact & !critical_rm & !protected_write & !ask_rule & !hook_block & !hook_deny & !hook_ask) -> proceed);
+// R3
+guarantee
+	G ((m_dontask & mcp_interact) -> block);
+// R3
+guarantee
+	G ((m_dontask & critical_rm) -> block);
+// B1
+guarantee
+	G ((m_bypass & !ask_rule & !mcp_interact & !critical_rm & !deny_rule & !hook_block & !hook_deny & !hook_ask) -> proceed);
+// B1
+guarantee
+	G ((m_bypass & (mcp_interact | critical_rm) & !deny_rule & !hook_block & !hook_deny) -> prompt);
+// N1
+guarantee
+	G ((mcp_interact & !m_dontask & !deny_rule & !hook_block & !hook_deny) -> prompt);
+// C1
+guarantee
+	G ((critical_rm & (m_default | m_accept | m_bypass) & !deny_rule & !hook_block & !hook_deny) -> prompt);
+// C1
+guarantee
+	G ((critical_rm & m_plan & !(auto_avail & !bypass_avail) & !deny_rule & !hook_block & !hook_deny) -> prompt);
+// C1
+guarantee
+	G ((critical_rm & m_plan & auto_avail & !bypass_avail & !ask_rule & !deny_rule & !hook_block & !hook_deny & !hook_ask) -> (proceed <-> classifier_ok));
+// C1
+guarantee
+	G ((critical_rm & m_auto & !ask_rule & !deny_rule & !hook_block & !hook_deny & !hook_ask) -> (proceed <-> classifier_ok));
+// C1
+guarantee
+	G ((critical_rm & m_auto & ask_rule & !deny_rule & !hook_block & !hook_deny) -> prompt);
+// P1
+guarantee
+	G ((protected_write & (m_default | m_accept) & !deny_rule & !hook_block & !hook_deny) -> prompt);
+// P1
+guarantee
+	G ((protected_write & m_plan & bypass_avail & !deny_rule & !hook_block & !hook_deny & !ask_rule) -> proceed);
+// P1
+guarantee
+	G ((protected_write & m_plan & !bypass_avail & auto_avail & !deny_rule & !hook_block & !hook_deny & !ask_rule & !hook_ask) -> (proceed <-> classifier_ok));
+// P1
+guarantee
+	G ((protected_write & m_plan & !bypass_avail & !auto_avail & !deny_rule & !hook_block & !hook_deny) -> prompt);
+// P1
+guarantee
+	G ((protected_write & m_auto & !deny_rule & !hook_block & !hook_deny & !ask_rule & !hook_ask) -> (proceed <-> classifier_ok));
+// P1
+guarantee
+	G ((protected_write & m_dontask) -> block);
+// P1
+guarantee
+	G ((protected_write & m_bypass & !deny_rule & !hook_block & !hook_deny & !ask_rule & !hook_ask) -> proceed);
+// L1
+guarantee
+	G ((m_plan & is_edit & !bypass_avail & !protected_write) -> block);
+// L1
+guarantee
+	G ((m_plan & bypass_avail & (is_edit | is_bash) & !ask_rule & !critical_rm & !deny_rule & !hook_block & !hook_deny & !hook_ask & !protected_write) -> proceed);
+// L2
+guarantee
+	G ((m_plan & is_bash & !bypass_avail & auto_avail & !critical_rm & !ask_rule & !deny_rule & !hook_block & !hook_deny & !hook_ask & !hook_allow) -> (proceed <-> classifier_ok));
+// L2
+guarantee
+	G ((m_plan & is_bash & !bypass_avail & !auto_avail & !critical_rm & !deny_rule & !hook_block & !hook_deny & !hook_allow) -> prompt);
+// U1
+guarantee
+	G ((m_auto & allow_rule & !protected_write & !critical_rm & !mcp_interact & !ask_rule & !deny_rule & !hook_block & !hook_deny & !hook_ask) -> proceed);
+// U1
+guarantee
+	G ((m_auto & (readonly | is_edit) & !protected_write & !allow_rule & !ask_rule & !deny_rule & !hook_block & !hook_deny & !hook_ask) -> proceed);
+// U1
+guarantee
+	G ((m_auto & is_bash & !critical_rm & !allow_rule & !ask_rule & !deny_rule & !hook_block & !hook_deny & !hook_ask & !hook_allow) -> (proceed <-> classifier_ok));
+// U1
+guarantee
+	G ((m_auto & !classifier_ok & is_bash & !allow_rule & !ask_rule & !deny_rule & !hook_block & !hook_deny & !hook_ask & !hook_allow & !critical_rm) -> block);
+// M1
+guarantee
+	G ((m_default & (is_bash | is_edit) & !allow_rule & !hook_allow & !sandboxed & !deny_rule & !hook_block & !hook_deny) -> prompt);
+// M2
+guarantee
+	G ((allow_rule & !deny_rule & !ask_rule & !bare_ask & !critical_rm & !protected_write & !mcp_interact & !hook_block & !hook_deny & !hook_ask & !m_dontask & !m_plan & !m_bypass & !m_auto) -> proceed);
+// K1
+guarantee
+	G ((m_accept & is_edit & !protected_write & !deny_rule & !ask_rule & !hook_block & !hook_deny & !hook_ask) -> proceed);
+// X5
+assumption
+	G (end_conv -> (!hook_block & !hook_deny & !hook_ask & !hook_allow));
+// X1
+guarantee
+	G ((proceed | prompt | block) & !(proceed & prompt) & !(proceed & block) & !(prompt & block));
+// X2
+assumption
+	G ((m_default | m_accept | m_plan | m_auto | m_dontask | m_bypass) & !(m_default & m_accept) & !(m_default & m_plan) & !(m_default & m_auto) & !(m_default & m_dontask) & !(m_default & m_bypass) & !(m_accept & m_plan) & !(m_accept & m_auto) & !(m_accept & m_dontask) & !(m_accept & m_bypass) & !(m_plan & m_auto) & !(m_plan & m_dontask) & !(m_plan & m_bypass) & !(m_auto & m_dontask) & !(m_auto & m_bypass) & !(m_dontask & m_bypass));
+// X3
+assumption
+	G (!(readonly & is_edit) & !(readonly & is_bash) & !(is_edit & is_bash) & !(mcp_interact & is_bash) & !(mcp_interact & is_edit) & !(mcp_interact & readonly) & !(end_conv & is_bash) & !(end_conv & is_edit) & !(end_conv & readonly) & !(end_conv & mcp_interact));
+// X4
+assumption
+	G ((critical_rm -> is_bash) & (sandboxed -> is_bash) & (bare_ask -> is_bash) & (protected_write -> is_edit) & (m_bypass -> bypass_avail));
+// X5
+assumption
+	G (!(hook_block & hook_allow) & !(hook_deny & hook_allow) & !(hook_ask & hook_allow) & !(hook_block & hook_deny) & !(hook_block & hook_ask) & !(hook_deny & hook_ask));

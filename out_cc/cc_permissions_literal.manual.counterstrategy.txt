@@ -1,0 +1,9 @@
+Found 1 unrealizable core system variables.
+At line 28 variable proceed.
+
+Initial Dead State Sf0 <m_default:false, m_accept:false, m_plan:false, m_auto:false, m_dontask:false, m_bypass:true, bypass_avail:true, auto_avail:false, deny_rule:false, ask_rule:false, bare_ask:false, allow_rule:false, hook_block:false, hook_deny:false, hook_ask:false, hook_allow:true, readonly:false, is_edit:false, is_bash:false, sandboxed:false, critical_rm:false, protected_write:false, mcp_interact:true, end_conv:false, classifier_ok:false, proceed:false>
+	With successors : Sf2
+Initial Dead State Sf1 <m_default:false, m_accept:false, m_plan:false, m_auto:false, m_dontask:false, m_bypass:true, bypass_avail:true, auto_avail:false, deny_rule:false, ask_rule:false, bare_ask:false, allow_rule:false, hook_block:false, hook_deny:false, hook_ask:false, hook_allow:true, readonly:false, is_edit:false, is_bash:false, sandboxed:false, critical_rm:false, protected_write:false, mcp_interact:true, end_conv:false, classifier_ok:false, proceed:true>
+	With successors : Sf2
+Dead State Sf2 <m_default:false, m_accept:false, m_plan:false, m_auto:false, m_dontask:false, m_bypass:false, bypass_avail:false, auto_avail:false, deny_rule:false, ask_rule:false, bare_ask:false, allow_rule:false, hook_block:false, hook_deny:false, hook_ask:false, hook_allow:false, readonly:false, is_edit:false, is_bash:false, sandboxed:false, critical_rm:false, protected_write:false, mcp_interact:false, end_conv:false, classifier_ok:false>
+	With no successors.

@@ -170,9 +170,12 @@ def _fmt(values: Dict[str, bool], names: List[str]) -> str:
     return (", ".join(t) or "(nothing)") + (f"    [not: {', '.join(f)}]" if f else "")
 
 
-def explain_dead(dead: "CSState", prev: Optional["CSState"], constraints) -> List[str]:
-    """Which guarantees does this losing controller response violate? constraints: iterable of (rule_id, kind, expr)."""
+def explain_dead(dead: "CSState", prev: Optional["CSState"], constraints, sys_names=()) -> List[str]:
+    """Which guarantees does this losing controller response violate? constraints: iterable of (rule_id, kind, expr).
+    Spectra omits sys variables that are false from some states; treat missing sys values as False."""
     from .evaluate import parse, evaluate, uses_next
+    if sys_names:
+        dead = CSState(dead.name, {**{v: False for v in sys_names}, **dead.values}, dead.succ, dead.initial, dead.dead)
     hits = []
     for rid, kind, expr in constraints:
         if kind != "guarantee":
@@ -205,7 +208,7 @@ def render_trace(cs: CounterStrategy, env_names: List[str], sys_names: List[str]
         lines.append(f"         controller:  no response satisfies every rule:")
         prev = path[-1] if path else None
         for d in deads:
-            why = explain_dead(d, prev, constraints)
+            why = explain_dead(d, prev, constraints, sys_names)
             lines.append(f"             {_fmt(d.values, sys_names):40s} violates {', '.join(why) if why else '?'}")
         # responses that are not even listed were ruled out by a transition rule from the previous step
         listed = {tuple(d.values.get(v) for v in sys_names) for d in deads}
@@ -217,7 +220,7 @@ def render_trace(cs: CounterStrategy, env_names: List[str], sys_names: List[str]
                     continue
                 vals = dict(zip(sys_names, combo))
                 fake = CSState("_", {**env_vals, **vals}, [])
-                why = explain_dead(fake, prev, constraints)
+                why = explain_dead(fake, prev, constraints, sys_names)
                 if why:
                     missing.append((vals, why))
             for vals, why in missing:
