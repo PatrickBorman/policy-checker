@@ -1,0 +1,41 @@
+name: trusted_monitoring
+description: >
+  A control protocol in the style of trusted monitoring with defer-to-trusted and auditing.
+  The environment is the untrusted model's outputs, the monitor's verdicts and resource state;
+  the system is the protocol, which must route every output.
+
+env:
+  - {name: output_ready,     desc: the untrusted model has produced an output this step}
+  - {name: flagged,          desc: the monitor flags this output as suspicious}
+  - {name: trusted_available, desc: the trusted model is available to take over}
+  - {name: budget_exhausted, desc: the human audit budget is exhausted}
+
+sys:
+  - {name: use_untrusted, desc: the protocol ships the untrusted output}
+  - {name: defer_trusted, desc: the protocol replaces the output with the trusted model's}
+  - {name: audit,         desc: the protocol sends the output to a human auditor}
+
+rules:
+  - id: G1
+    kind: guarantee
+    text: Every output must be routed in the same step to exactly one of use_untrusted, defer_trusted or audit; nothing is routed when there is no output.
+    spectra:
+      - "G (output_ready -> (use_untrusted | defer_trusted | audit))"
+      - "G (!(use_untrusted & defer_trusted) & !(use_untrusted & audit) & !(defer_trusted & audit))"
+      - "G (!output_ready -> (!use_untrusted & !defer_trusted & !audit))"
+  - id: G2
+    kind: guarantee
+    text: Never ship an output that the monitor flagged.
+    spectra: "G ((output_ready & flagged) -> !use_untrusted)"
+  - id: G3
+    kind: guarantee
+    text: Do not audit once the audit budget is exhausted.
+    spectra: "G (budget_exhausted -> !audit)"
+  - id: G4
+    kind: guarantee
+    text: Do not defer to the trusted model when it is unavailable.
+    spectra: "G (!trusted_available -> !defer_trusted)"
+  - id: A1
+    kind: assumption
+    text: Once the audit budget is exhausted it stays exhausted.
+    spectra: "G (budget_exhausted -> next(budget_exhausted))"

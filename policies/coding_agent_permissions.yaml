@@ -1,0 +1,40 @@
+name: coding_agent_permissions
+description: >
+  Permission rules for a coding agent (allow / deny / ask-the-user) over shell and file-write
+  requests, in the style of an IDE agent's permission settings. Intended to be realisable.
+
+env:
+  - {name: req_shell,     desc: the agent requests to run a shell command this step}
+  - {name: req_write,     desc: the agent requests to write a file this step}
+  - {name: in_sandbox,    desc: the request would run inside the sandbox}
+  - {name: user_approved, desc: the user approved the pending request this step}
+
+sys:
+  - {name: allow, desc: the request proceeds}
+  - {name: deny,  desc: the request is refused}
+  - {name: ask,   desc: the user is prompted}
+
+rules:
+  - id: G1
+    kind: guarantee
+    text: Each step with a request must be answered with exactly one of allow, deny or ask; with no request, none of them.
+    spectra:
+      - "G ((req_shell | req_write) -> (allow | deny | ask))"
+      - "G (!(allow & deny) & !(allow & ask) & !(deny & ask))"
+      - "G (!(req_shell | req_write) -> (!allow & !deny & !ask))"
+  - id: G2
+    kind: guarantee
+    text: Shell commands outside the sandbox are never allowed without the user's approval in the same step.
+    spectra: "G ((req_shell & !in_sandbox & !user_approved) -> !allow)"
+  - id: G3
+    kind: guarantee
+    text: File writes inside the sandbox are always allowed.
+    spectra: "G ((req_write & in_sandbox & !req_shell) -> allow)"
+  - id: G4
+    kind: guarantee
+    text: If the user approved, the request is allowed.
+    spectra: "G (((req_shell | req_write) & user_approved) -> allow)"
+  - id: A1
+    kind: assumption
+    text: The user does not approve when nothing was requested.
+    spectra: "G (user_approved -> (req_shell | req_write))"

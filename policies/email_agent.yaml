@@ -1,0 +1,40 @@
+name: email_agent
+description: >
+  Guardrails for a customer-service agent that can send emails. The environment is the
+  agent's proposals plus the world (user confirmations, open refund cases); the system is
+  the control layer that must resolve every proposal as allow, block or escalate.
+
+env:
+  - {name: req_send,     desc: the agent proposes to send an email this step}
+  - {name: user_confirm, desc: the user has confirmed the pending send this step}
+  - {name: refund_open,  desc: a refund case is currently open for this customer}
+
+sys:
+  - {name: allow,    desc: the controller lets the proposed send execute}
+  - {name: block,    desc: the controller rejects the proposed send}
+  - {name: escalate, desc: the controller routes the proposal to a human}
+
+rules:
+  - id: G1
+    kind: guarantee
+    text: Every proposed send must be resolved in the same step as exactly one of allow, block or escalate.
+    spectra:
+      - "G (req_send -> (allow | block | escalate))"
+      - "G (!(allow & block) & !(allow & escalate) & !(block & escalate))"
+      - "G (!req_send -> (!allow & !block & !escalate))"
+  - id: G2
+    kind: guarantee
+    text: Never allow a send unless the user confirmed it in the same step.
+    spectra: "G ((req_send & !user_confirm) -> !allow)"
+  - id: G3
+    kind: guarantee
+    text: Do not escalate in two consecutive steps (escalation fatigue rule from the ops team).
+    spectra: "G (escalate -> !next(escalate))"
+  - id: G4
+    kind: guarantee
+    text: While a refund case is open, never block a send request - the customer must be kept informed.
+    spectra: "G ((refund_open & req_send) -> !block)"
+  - id: A1
+    kind: assumption
+    text: The user only confirms when there is a pending proposal.
+    spectra: "G (user_confirm -> req_send)"
