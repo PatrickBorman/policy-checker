@@ -1,0 +1,38 @@
+module support_refunds
+
+env boolean req_refund;
+env boolean amount_high;
+env boolean verified;
+env boolean fraud_flag;
+env boolean manager_ok;
+sys boolean approve;
+sys boolean reject;
+sys boolean escalate;
+
+// G1
+guarantee
+	G (req_refund -> (approve | reject | escalate));
+// G1
+guarantee
+	G (!(approve & reject));
+// G1
+guarantee
+	G (!(approve & escalate));
+// G1
+guarantee
+	G (!(reject & escalate));
+// G1
+guarantee
+	G (!req_refund -> (!approve & !reject & !escalate));
+// G2
+guarantee
+	G (fraud_flag -> !approve);
+// G3
+guarantee
+	G ((req_refund & amount_high & !manager_ok) -> !approve);
+// G4
+guarantee
+	G (!verified -> !approve);
+// G5
+guarantee
+	G ((req_refund & verified & !amount_high & !fraud_flag) -> (approve & !escalate));

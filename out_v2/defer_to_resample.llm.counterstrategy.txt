@@ -1,0 +1,25 @@
+Found 3 unrealizable core system variables.
+At line 6 variable ship.
+At line 7 variable resample.
+At line 8 variable defer.
+
+Initial Dead State Sf0 <output_ready:true, flagged:true, trusted_available:false, ship:false, resample:false, defer:false>
+	With successors : Sf9
+Initial Dead State Sf1 <output_ready:true, flagged:true, trusted_available:false, ship:false, resample:false, defer:true>
+	With successors : Sf9
+Initial State S2 <output_ready:true, flagged:true, trusted_available:false, ship:false, resample:true, defer:false>
+	With successors : Sf0, Sf1, Sf4, Sf5
+Initial Dead State Sf3 <output_ready:true, flagged:true, trusted_available:false, ship:false, resample:true, defer:true>
+	With successors : Sf8
+Initial Dead State Sf4 <output_ready:true, flagged:true, trusted_available:false, ship:true, resample:false, defer:false>
+	With successors : Sf9
+Initial Dead State Sf5 <output_ready:true, flagged:true, trusted_available:false, ship:true, resample:false, defer:true>
+	With successors : Sf9
+Initial Dead State Sf6 <output_ready:true, flagged:true, trusted_available:false, ship:true, resample:true, defer:false>
+	With successors : Sf8
+Initial Dead State Sf7 <output_ready:true, flagged:true, trusted_available:false, ship:true, resample:true, defer:true>
+	With successors : Sf8
+Dead State Sf8 <output_ready:true, flagged:false, trusted_available:false>
+	With no successors.
+Dead State Sf9 <output_ready:false, flagged:false, trusted_available:false>
+	With no successors.

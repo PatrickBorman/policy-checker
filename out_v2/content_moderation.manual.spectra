@@ -1,0 +1,28 @@
+module content_moderation
+
+env boolean post_ready;
+env boolean toxic;
+env boolean appeal_pending;
+env boolean human_available;
+sys boolean publish;
+sys boolean remove;
+sys boolean hold;
+
+// G1
+guarantee
+	G (post_ready -> (publish | remove | hold));
+// G1
+guarantee
+	G (!(publish & remove) & !(publish & hold) & !(remove & hold));
+// G1
+guarantee
+	G (!post_ready -> (!publish & !remove & !hold));
+// G2
+guarantee
+	G (toxic -> !publish);
+// G3
+guarantee
+	G (appeal_pending -> !remove);
+// G4
+guarantee
+	G (!human_available -> !hold);

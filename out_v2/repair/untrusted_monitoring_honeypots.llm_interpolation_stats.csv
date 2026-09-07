@@ -1,0 +1,2 @@
+Filename,NumRepairs,RepairLimit,TimeToFirst,Runtime,Timeout,TimedOut,NodesExplored,DuplicateNodes,NumInterpolantsComputed,NumNonStateSeparable
+/Users/patrickborman/Documents/policy-checker/out_v2/untrusted_monitoring_honeypots.llm.spectra,1,1,0.4331568640000003,0.4337859930000003,120.0,False,3,0,2,0

@@ -1,0 +1,9 @@
+Found 1 unrealizable core system variables.
+At line 6 variable grant.
+
+Initial Dead State Sf0 <req_elevated:true, approved:false, emergency:true, grant:false>
+	With successors : Sf2
+Initial Dead State Sf1 <req_elevated:true, approved:false, emergency:true, grant:true>
+	With successors : Sf2
+Dead State Sf2 <req_elevated:false, approved:false, emergency:false>
+	With no successors.

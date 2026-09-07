@@ -1,0 +1,44 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (post_ready -> (publish | remove | hold))",
+        "G (!(publish & remove))",
+        "G (!(publish & hold))",
+        "G (!(remove & hold))",
+        "G (!post_ready -> (!publish & !remove & !hold))"
+      ],
+      "note": "Ensures exactly one decision (publish, remove, or hold) if a post is ready, and no decision otherwise.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G (toxic -> !publish)"
+      ],
+      "note": "Prohibits publishing posts classified as toxic.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G (appeal_pending -> !remove)"
+      ],
+      "note": "Prohibits removing posts that have a pending appeal.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G (hold -> human_available)"
+      ],
+      "note": "Allows holding a post for human review only if a reviewer is available.",
+      "approximate": false
+    }
+  ]
+}

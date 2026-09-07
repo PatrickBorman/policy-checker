@@ -1,0 +1,44 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (req_submit -> (allow | block | ask))",
+        "G (!(allow & block))",
+        "G (!(allow & ask))",
+        "G (!(block & ask))",
+        "G (!req_submit -> (!allow & !block & !ask))"
+      ],
+      "note": "Encodes that a submission gets exactly one decision, and no decision without a request.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((req_submit & contains_pii & external & !ask) -> !allow)"
+      ],
+      "note": "Interprets 'without asking the user first' as requiring 'ask' in the same step for 'allow' under these conditions.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G (!user_present -> !ask)"
+      ],
+      "note": "Direct translation: if no user is present, asking is prohibited.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((req_submit & !external & !contains_pii) -> (allow & !ask))"
+      ],
+      "note": "Encodes the obligation to allow and not ask for internal submissions without PII.",
+      "approximate": false
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+module financial_advice
+
+env boolean query;
+env boolean personalised;
+env boolean reviewer_available;
+sys boolean answer;
+sys boolean generic;
+sys boolean refer;
+
+// G1
+guarantee
+	G (query -> (answer | generic | refer));
+// G1
+guarantee
+	G (!(answer & generic) & !(answer & refer) & !(generic & refer));
+// G1
+guarantee
+	G (!query -> (!answer & !generic & !refer));
+// G2
+guarantee
+	G (personalised -> !answer);
+// G3
+guarantee
+	G (!reviewer_available -> !refer);
+// G4
+guarantee
+	G ((query & !personalised) -> answer);

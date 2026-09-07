@@ -1,0 +1,23 @@
+Found 3 unrealizable core system variables.
+At line 7 variable publish.
+At line 8 variable remove.
+At line 9 variable hold.
+
+Initial Dead State Sf0 <post_ready:true, toxic:true, appeal_pending:true, human_available:false, publish:false, remove:false, hold:false>
+	With successors : Sf8
+Initial Dead State Sf1 <post_ready:true, toxic:true, appeal_pending:true, human_available:false, publish:false, remove:false, hold:true>
+	With successors : Sf8
+Initial Dead State Sf2 <post_ready:true, toxic:true, appeal_pending:true, human_available:false, publish:false, remove:true, hold:false>
+	With successors : Sf8
+Initial Dead State Sf3 <post_ready:true, toxic:true, appeal_pending:true, human_available:false, publish:false, remove:true, hold:true>
+	With successors : Sf8
+Initial Dead State Sf4 <post_ready:true, toxic:true, appeal_pending:true, human_available:false, publish:true, remove:false, hold:false>
+	With successors : Sf8
+Initial Dead State Sf5 <post_ready:true, toxic:true, appeal_pending:true, human_available:false, publish:true, remove:false, hold:true>
+	With successors : Sf8
+Initial Dead State Sf6 <post_ready:true, toxic:true, appeal_pending:true, human_available:false, publish:true, remove:true, hold:false>
+	With successors : Sf8
+Initial Dead State Sf7 <post_ready:true, toxic:true, appeal_pending:true, human_available:false, publish:true, remove:true, hold:true>
+	With successors : Sf8
+Dead State Sf8 <post_ready:false, toxic:false, appeal_pending:false, human_available:false>
+	With no successors.

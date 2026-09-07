@@ -1,0 +1,23 @@
+Found 3 unrealizable core system variables.
+At line 7 variable recommend.
+At line 8 variable escalate.
+At line 9 variable hold.
+
+Initial Dead State Sf0 <case_ready:true, urgent:true, low_confidence:true, clinician_available:false, recommend:false, escalate:false, hold:false>
+	With successors : Sf8
+Initial Dead State Sf1 <case_ready:true, urgent:true, low_confidence:true, clinician_available:false, recommend:false, escalate:false, hold:true>
+	With successors : Sf8
+Initial Dead State Sf2 <case_ready:true, urgent:true, low_confidence:true, clinician_available:false, recommend:false, escalate:true, hold:false>
+	With successors : Sf8
+Initial Dead State Sf3 <case_ready:true, urgent:true, low_confidence:true, clinician_available:false, recommend:false, escalate:true, hold:true>
+	With successors : Sf8
+Initial Dead State Sf4 <case_ready:true, urgent:true, low_confidence:true, clinician_available:false, recommend:true, escalate:false, hold:false>
+	With successors : Sf8
+Initial Dead State Sf5 <case_ready:true, urgent:true, low_confidence:true, clinician_available:false, recommend:true, escalate:false, hold:true>
+	With successors : Sf8
+Initial Dead State Sf6 <case_ready:true, urgent:true, low_confidence:true, clinician_available:false, recommend:true, escalate:true, hold:false>
+	With successors : Sf8
+Initial Dead State Sf7 <case_ready:true, urgent:true, low_confidence:true, clinician_available:false, recommend:true, escalate:true, hold:true>
+	With successors : Sf8
+Dead State Sf8 <case_ready:false, urgent:false, low_confidence:false, clinician_available:false>
+	With no successors.

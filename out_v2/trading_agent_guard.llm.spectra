@@ -1,0 +1,34 @@
+module trading_agent_guard
+
+env boolean req_trade;
+env boolean over_limit;
+env boolean market_halt;
+env boolean officer_ok;
+sys boolean execute;
+sys boolean reject;
+sys boolean queue;
+
+// G1
+guarantee
+	G (req_trade -> (execute | reject | queue));
+// G1
+guarantee
+	G (!(execute & reject) & !(execute & queue) & !(reject & queue));
+// G1
+guarantee
+	G (!req_trade -> (!execute & !reject & !queue));
+// G2
+guarantee
+	G (market_halt -> !execute);
+// G3
+guarantee
+	G ((req_trade & over_limit & !officer_ok) -> !execute);
+// G4
+guarantee
+	G (queue -> !next(queue));
+// G5
+guarantee
+	G ((req_trade & officer_ok) -> !reject);
+// A1
+assumption
+	G (queue -> next(req_trade));

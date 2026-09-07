@@ -1,0 +1,14 @@
+Found 2 unrealizable core system variables.
+At line 7 variable allow.
+At line 8 variable deny.
+
+Initial Dead State Sf0 <req_tool:true, essential:true, budget_exhausted:true, kill_switch:false, allow:false, deny:false>
+	With successors : Sf4
+Initial Dead State Sf1 <req_tool:true, essential:true, budget_exhausted:true, kill_switch:false, allow:false, deny:true>
+	With successors : Sf4
+Initial Dead State Sf2 <req_tool:true, essential:true, budget_exhausted:true, kill_switch:false, allow:true, deny:false>
+	With successors : Sf4
+Initial Dead State Sf3 <req_tool:true, essential:true, budget_exhausted:true, kill_switch:false, allow:true, deny:true>
+	With successors : Sf4
+Dead State Sf4 <req_tool:false, essential:false, budget_exhausted:false, kill_switch:false>
+	With no successors.

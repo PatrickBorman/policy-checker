@@ -1,0 +1,53 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (decision_ready -> (act_auto | defer_human | halt))",
+        "G (!(act_auto & defer_human))",
+        "G (!(act_auto & halt))",
+        "G (!(defer_human & halt))",
+        "G (!decision_ready -> (!act_auto & !defer_human & !halt))"
+      ],
+      "note": "Encodes 'exactly one of' for decisions and 'nothing without a decision'.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G (anomaly -> !act_auto)"
+      ],
+      "note": "Prohibits automatic action when an anomaly is detected.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G (override -> !act_auto)"
+      ],
+      "note": "Prohibits automatic action when an override is requested.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G (defer_human -> human_available)"
+      ],
+      "note": "Requires a human to be available for deferral.",
+      "approximate": false
+    },
+    {
+      "id": "G5",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((decision_ready & !anomaly & !override) -> act_auto)"
+      ],
+      "note": "Obligates automatic action when a decision is due, and there is no anomaly or override.",
+      "approximate": false
+    }
+  ]
+}

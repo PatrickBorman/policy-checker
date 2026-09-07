@@ -1,0 +1,40 @@
+module ide_agent_allow_deny
+
+env boolean req;
+env boolean matches_allow;
+env boolean matches_deny;
+env boolean user_approved;
+sys boolean allow;
+sys boolean deny;
+sys boolean ask;
+
+// G1
+guarantee
+	G (req -> (allow | deny | ask));
+// G1
+guarantee
+	G (!(allow & deny));
+// G1
+guarantee
+	G (!(allow & ask));
+// G1
+guarantee
+	G (!(deny & ask));
+// G1
+guarantee
+	G (!req -> (!allow & !deny & !ask));
+// G2
+guarantee
+	G (matches_deny -> !allow);
+// G2
+guarantee
+	G (matches_deny -> !ask);
+// G3
+guarantee
+	G ((req & matches_allow & !matches_deny) -> (allow & !ask));
+// G4
+guarantee
+	G (user_approved -> allow);
+// A1
+assumption
+	G (user_approved -> req);

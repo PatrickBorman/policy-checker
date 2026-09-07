@@ -1,0 +1,2 @@
+Filename,NumRepairs,RepairLimit,TimeToFirst,Runtime,Timeout,TimedOut,NodesExplored,DuplicateNodes,NumInterpolantsComputed,NumNonStateSeparable
+/Users/patrickborman/Documents/policy-checker/out_v2/trading_agent_guard.llm.spectra,1,1,0.2542377960000004,0.2548897390000002,120.0,False,2,0,1,0

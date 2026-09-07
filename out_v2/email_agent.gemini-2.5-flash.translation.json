@@ -1,0 +1,53 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (req_send -> (allow | block | escalate))",
+        "G (!(allow & block))",
+        "G (!(allow & escalate))",
+        "G (!(block & escalate))",
+        "G (!req_send -> (!allow & !block & !escalate))"
+      ],
+      "note": "Ensures exactly one decision (allow, block, escalate) is made for every proposed send, and no decision without a proposal.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G (allow -> user_confirm)"
+      ],
+      "note": "Prohibits allowing a send without user confirmation.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G (escalate -> !next(escalate))"
+      ],
+      "note": "Prevents escalation in consecutive steps.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((req_send & refund_open) -> !block)"
+      ],
+      "note": "Prohibits blocking a send request when a refund case is open.",
+      "approximate": false
+    },
+    {
+      "id": "A1",
+      "kind": "assumption",
+      "spectra": [
+        "G (user_confirm -> req_send)"
+      ],
+      "note": "Assumes user confirmation only happens if there is a pending send proposal.",
+      "approximate": false
+    }
+  ]
+}

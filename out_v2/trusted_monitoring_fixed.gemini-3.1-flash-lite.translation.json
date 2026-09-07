@@ -1,0 +1,51 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (output_ready -> (use_untrusted | defer_trusted | audit))",
+        "G (!(use_untrusted & defer_trusted) & !(use_untrusted & audit) & !(defer_trusted & audit))",
+        "G (!output_ready -> (!use_untrusted & !defer_trusted & !audit))"
+      ],
+      "note": "Ensures exactly one action is taken when output is ready, and no action otherwise.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((output_ready & flagged) -> !use_untrusted)"
+      ],
+      "note": "Prohibits shipping flagged outputs.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((output_ready & flagged & !budget_exhausted) -> audit)"
+      ],
+      "note": "Forces audit for flagged outputs when budget is available.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((output_ready & flagged & budget_exhausted) -> defer_trusted)"
+      ],
+      "note": "Forces deferral to trusted model for flagged outputs when budget is exhausted.",
+      "approximate": false
+    },
+    {
+      "id": "A1",
+      "kind": "assumption",
+      "spectra": [
+        "G (trusted_available)"
+      ],
+      "note": "Assumes the trusted model is always available.",
+      "approximate": false
+    }
+  ]
+}

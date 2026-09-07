@@ -1,0 +1,44 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (query -> (answer | generic | refer))",
+        "G (!(answer & generic))",
+        "G (!(answer & refer))",
+        "G (!(generic & refer))",
+        "G (!query -> (!answer & !generic & !refer))"
+      ],
+      "note": "Encodes that every question gets exactly one decision, and no decision without a question.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G (personalised -> !answer)"
+      ],
+      "note": "Directly translates the prohibition against answering personalised advice directly.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G (refer -> reviewer_available)"
+      ],
+      "note": "Encodes that referring requires a reviewer to be available.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((query & !personalised) -> answer)"
+      ],
+      "note": "Encodes the obligation to answer non-personalised questions directly.",
+      "approximate": false
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+module defer_to_resample
+
+env boolean output_ready;
+env boolean flagged;
+env boolean trusted_available;
+sys boolean ship;
+sys boolean resample;
+sys boolean defer;
+
+// G1
+guarantee
+	G (output_ready -> (ship | resample | defer));
+// G1
+guarantee
+	G (!(ship & resample));
+// G1
+guarantee
+	G (!(ship & defer));
+// G1
+guarantee
+	G (!(resample & defer));
+// G1
+guarantee
+	G (!output_ready -> (!ship & !resample & !defer));
+// G2
+guarantee
+	G (flagged -> !ship);
+// G3
+guarantee
+	G (resample -> !next(resample));
+// G4
+guarantee
+	G (defer -> trusted_available);
+// A1
+assumption
+	G (resample -> next(output_ready));

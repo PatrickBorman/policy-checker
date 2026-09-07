@@ -1,0 +1,60 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (req_trade -> (execute | reject | queue))",
+        "G (!(execute & reject) & !(execute & queue) & !(reject & queue))",
+        "G (!req_trade -> (!execute & !reject & !queue))"
+      ],
+      "note": "Ensures exactly one action per proposal and no action without a proposal.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G (market_halt -> !execute)"
+      ],
+      "note": "Prohibits execution when market_halt is true.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((req_trade & over_limit & !officer_ok) -> !execute)"
+      ],
+      "note": "Restricts execution of over-limit trades to those with officer_ok.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G (queue -> !next(queue))"
+      ],
+      "note": "Prevents consecutive queueing of the same order.",
+      "approximate": false
+    },
+    {
+      "id": "G5",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((req_trade & officer_ok) -> !reject)"
+      ],
+      "note": "Prohibits rejection if the risk officer has approved.",
+      "approximate": false
+    },
+    {
+      "id": "A1",
+      "kind": "assumption",
+      "spectra": [
+        "G (queue -> next(req_trade))"
+      ],
+      "note": "Assumes that if an order is queued, the environment will propose it again in the next step.",
+      "approximate": false
+    }
+  ]
+}

@@ -1,0 +1,563 @@
+[
+  {
+    "policy_set": "agent_handoff",
+    "source": "policies/agent_handoff.yaml",
+    "mode": "llm",
+    "rules": 4,
+    "translator": "gemini-2.5-flash",
+    "approximate_rules": [],
+    "t_translate_s": 8.7,
+    "spectra": "out_v2/agent_handoff.llm.spectra",
+    "realizable": true,
+    "t_check_s": 2.07,
+    "manual_realizable": true,
+    "agrees_with_manual": true,
+    "agreement": "exact"
+  },
+  {
+    "policy_set": "ai_act_human_oversight",
+    "source": "policies/ai_act_human_oversight.yaml",
+    "mode": "llm",
+    "rules": 5,
+    "translator": "gemini-2.5-flash",
+    "approximate_rules": [],
+    "t_translate_s": 5.24,
+    "spectra": "out_v2/ai_act_human_oversight.llm.spectra",
+    "realizable": true,
+    "t_check_s": 1.61,
+    "manual_realizable": true,
+    "agrees_with_manual": true,
+    "agreement": "exact"
+  },
+  {
+    "policy_set": "break_glass_access",
+    "source": "policies/break_glass_access.yaml",
+    "mode": "llm",
+    "rules": 5,
+    "translator": "gemini-2.5-flash",
+    "approximate_rules": [],
+    "t_translate_s": 11.0,
+    "spectra": "out_v2/break_glass_access.llm.spectra",
+    "realizable": false,
+    "t_check_s": 1.39,
+    "y_sat": true,
+    "core_rules": [
+      "G2",
+      "G3"
+    ],
+    "counter_trace": "step 0:  environment: req_elevated, emergency    [not: approved]\n         controller:  no response satisfies every rule:\n             (nothing)    [not: grant]                violates G3\n             grant                                    violates G2",
+    "manual_realizable": false,
+    "manual_core_rules": [
+      "G2",
+      "G3"
+    ],
+    "agrees_with_manual": true,
+    "agreement": "exact",
+    "repairs": [
+      "G(!(req_elevated & emergency & !approved))"
+    ],
+    "t_repair_s": 9.4,
+    "repair_nodes": 3
+  },
+  {
+    "policy_set": "browsing_agent_pii",
+    "source": "policies/browsing_agent_pii.yaml",
+    "mode": "llm",
+    "rules": 4,
+    "translator": "gemini-2.5-flash",
+    "approximate_rules": [],
+    "t_translate_s": 8.61,
+    "spectra": "out_v2/browsing_agent_pii.llm.spectra",
+    "realizable": true,
+    "t_check_s": 1.89,
+    "manual_realizable": true,
+    "agrees_with_manual": true,
+    "agreement": "exact"
+  },
+  {
+    "policy_set": "clinical_triage",
+    "source": "policies/clinical_triage.yaml",
+    "mode": "llm",
+    "rules": 4,
+    "translator": "gemini-2.5-flash",
+    "approximate_rules": [],
+    "t_translate_s": 6.19,
+    "spectra": "out_v2/clinical_triage.llm.spectra",
+    "realizable": false,
+    "t_check_s": 1.33,
+    "y_sat": true,
+    "core_rules": [
+      "G1",
+      "G2",
+      "G3",
+      "G4"
+    ],
+    "counter_trace": "step 0:  environment: case_ready, urgent, low_confidence    [not: clinician_available]\n         controller:  no response satisfies every rule:\n             (nothing)    [not: recommend, escalate, hold] violates G1\n             hold    [not: recommend, escalate]       violates G3\n             escalate    [not: recommend, hold]       violates G4\n             escalate, hold    [not: recommend]       violates G1, G3, G4\n             recommend    [not: escalate, hold]       violates G2\n             recommend, hold    [not: escalate]       violates G1, G2, G3\n             recommend, escalate    [not: hold]       violates G1, G2, G4\n             recommend, escalate, hold                violates G1, G2, G3, G4",
+    "manual_realizable": false,
+    "manual_core_rules": [
+      "G1",
+      "G2",
+      "G3",
+      "G4"
+    ],
+    "agrees_with_manual": true,
+    "agreement": "exact",
+    "repairs": [
+      "G(!(urgent & low_confidence & case_ready & !clinician_available))"
+    ],
+    "t_repair_s": 2.36,
+    "repair_nodes": 2
+  },
+  {
+    "policy_set": "coding_agent_permissions",
+    "source": "policies/coding_agent_permissions.yaml",
+    "mode": "llm",
+    "rules": 5,
+    "translator": "gemini-2.5-flash",
+    "approximate_rules": [],
+    "t_translate_s": 7.84,
+    "spectra": "out_v2/coding_agent_permissions.llm.spectra",
+    "realizable": true,
+    "t_check_s": 1.48,
+    "manual_realizable": true,
+    "agrees_with_manual": true,
+    "agreement": "exact"
+  },
+  {
+    "policy_set": "content_moderation",
+    "source": "policies/content_moderation.yaml",
+    "mode": "llm",
+    "rules": 4,
+    "translator": "gemini-2.5-flash",
+    "approximate_rules": [],
+    "t_translate_s": 5.25,
+    "spectra": "out_v2/content_moderation.llm.spectra",
+    "realizable": false,
+    "t_check_s": 1.59,
+    "y_sat": true,
+    "core_rules": [
+      "G1",
+      "G2",
+      "G3",
+      "G4"
+    ],
+    "counter_trace": "step 0:  environment: post_ready, toxic, appeal_pending    [not: human_available]\n         controller:  no response satisfies every rule:\n             (nothing)    [not: publish, remove, hold] violates G1\n             hold    [not: publish, remove]           violates G4\n             remove    [not: publish, hold]           violates G3\n             remove, hold    [not: publish]           violates G1, G3, G4\n             publish    [not: remove, hold]           violates G2\n             publish, hold    [not: remove]           violates G1, G2, G4\n             publish, remove    [not: hold]           violates G1, G2, G3\n             publish, remove, hold                    violates G1, G2, G3, G4",
+    "manual_realizable": false,
+    "manual_core_rules": [
+      "G1",
+      "G2",
+      "G3",
+      "G4"
+    ],
+    "agrees_with_manual": true,
+    "agreement": "exact",
+    "repairs": [
+      "G(!(!human_available & post_ready & appeal_pending & toxic))"
+    ],
+    "t_repair_s": 3.52,
+    "repair_nodes": 2
+  },
+  {
+    "policy_set": "data_deletion",
+    "source": "policies/data_deletion.yaml",
+    "mode": "llm",
+    "rules": 4,
+    "translator": "gemini-2.5-flash",
+    "approximate_rules": [],
+    "t_translate_s": 6.99,
+    "spectra": "out_v2/data_deletion.llm.spectra",
+    "realizable": true,
+    "t_check_s": 1.71,
+    "manual_realizable": true,
+    "agrees_with_manual": true,
+    "agreement": "exact"
+  },
+  {
+    "policy_set": "defer_to_resample",
+    "source": "policies/defer_to_resample.yaml",
+    "mode": "llm",
+    "rules": 5,
+    "translator": "gemini-2.5-flash",
+    "approximate_rules": [],
+    "t_translate_s": 8.84,
+    "spectra": "out_v2/defer_to_resample.llm.spectra",
+    "realizable": false,
+    "t_check_s": 1.5,
+    "y_sat": true,
+    "core_rules": [
+      "G1",
+      "G2",
+      "G3",
+      "G4"
+    ],
+    "counter_trace": "step 0:  environment: output_ready, flagged    [not: trusted_available]\n         controller:  resample    [not: ship, defer]\nstep 1:  environment: output_ready, flagged    [not: trusted_available]\n         controller:  no response satisfies every rule:\n             (nothing)    [not: ship, resample, defer] violates G1\n             defer    [not: ship, resample]           violates G4\n             ship    [not: resample, defer]           violates G2\n             ship, defer    [not: resample]           violates G1, G2, G4\n             resample    [not: ship, defer]           violates G3\n             resample, defer    [not: ship]           violates G1, G3, G4\n             ship, resample    [not: defer]           violates G1, G2, G3\n             ship, resample, defer                    violates G1, G2, G3, G4",
+    "manual_realizable": false,
+    "manual_core_rules": [
+      "G1",
+      "G2",
+      "G3",
+      "G4"
+    ],
+    "agrees_with_manual": true,
+    "agreement": "exact",
+    "repairs": [
+      "G(!(flagged & output_ready & !trusted_available))"
+    ],
+    "t_repair_s": 2.68,
+    "repair_nodes": 2
+  },
+  {
+    "policy_set": "drone_geofence",
+    "source": "policies/drone_geofence.yaml",
+    "mode": "llm",
+    "rules": 4,
+    "translator": "gemini-2.5-flash",
+    "approximate_rules": [],
+    "t_translate_s": 5.26,
+    "spectra": "out_v2/drone_geofence.llm.spectra",
+    "realizable": true,
+    "t_check_s": 2.37,
+    "manual_realizable": true,
+    "agrees_with_manual": true,
+    "agreement": "exact"
+  },
+  {
+    "policy_set": "email_agent",
+    "source": "policies/email_agent.yaml",
+    "mode": "llm",
+    "rules": 5,
+    "translator": "gemini-2.5-flash",
+    "approximate_rules": [],
+    "t_translate_s": 8.86,
+    "spectra": "out_v2/email_agent.llm.spectra",
+    "realizable": false,
+    "t_check_s": 1.57,
+    "y_sat": true,
+    "core_rules": [
+      "G1",
+      "G2",
+      "G3",
+      "G4"
+    ],
+    "counter_trace": "step 0:  environment: req_send, refund_open    [not: user_confirm]\n         controller:  escalate    [not: allow, block]\nstep 1:  environment: req_send, refund_open    [not: user_confirm]\n         controller:  no response satisfies every rule:\n             (nothing)    [not: allow, block, escalate] violates G1\n             block    [not: allow, escalate]          violates G4\n             allow    [not: block, escalate]          violates G2\n             allow, block    [not: escalate]          violates G1, G2, G4\n             escalate    [not: allow, block]          violates G3\n             block, escalate    [not: allow]          violates G1, G3, G4\n             allow, escalate    [not: block]          violates G1, G2, G3\n             allow, block, escalate                   violates G1, G2, G3, G4",
+    "manual_realizable": false,
+    "manual_core_rules": [
+      "G1",
+      "G2",
+      "G3",
+      "G4"
+    ],
+    "agrees_with_manual": true,
+    "agreement": "exact",
+    "repairs": [
+      "G((req_send & refund_open & !user_confirm) -> next(!(refund_open & req_send & !user_confirm)))"
+    ],
+    "t_repair_s": 2.74,
+    "repair_nodes": 2
+  },
+  {
+    "policy_set": "financial_advice",
+    "source": "policies/financial_advice.yaml",
+    "mode": "llm",
+    "rules": 4,
+    "translator": "gemini-2.5-flash",
+    "approximate_rules": [],
+    "t_translate_s": 5.66,
+    "spectra": "out_v2/financial_advice.llm.spectra",
+    "realizable": true,
+    "t_check_s": 1.58,
+    "manual_realizable": true,
+    "agrees_with_manual": true,
+    "agreement": "exact"
+  },
+  {
+    "policy_set": "hiring_screening",
+    "source": "policies/hiring_screening.yaml",
+    "mode": "llm",
+    "rules": 5,
+    "translator": "gemini-3.1-flash-lite",
+    "approximate_rules": [],
+    "t_translate_s": 3.18,
+    "spectra": "out_v2/hiring_screening.llm.spectra",
+    "realizable": false,
+    "t_check_s": 1.41,
+    "y_sat": true,
+    "core_rules": [
+      "G1",
+      "G2",
+      "G3",
+      "G4"
+    ],
+    "counter_trace": "step 0:  environment: cv_ready, protected_attr    [not: human_available]\n         controller:  hold    [not: shortlist, reject]\nstep 1:  environment: cv_ready, protected_attr    [not: human_available]\n         controller:  no response satisfies every rule:\n             (nothing)    [not: shortlist, reject, hold] violates G1\n             reject    [not: shortlist, hold]         violates G2\n             shortlist    [not: reject, hold]         violates G3\n             shortlist, reject    [not: hold]         violates G1, G2, G3\n             hold    [not: shortlist, reject]         violates G4\n             reject, hold    [not: shortlist]         violates G1, G2, G4\n             shortlist, hold    [not: reject]         violates G1, G3, G4\n             shortlist, reject, hold                  violates G1, G2, G3, G4",
+    "manual_realizable": false,
+    "manual_core_rules": [
+      "G1",
+      "G2",
+      "G3",
+      "G4"
+    ],
+    "agrees_with_manual": true,
+    "agreement": "exact",
+    "repairs": [
+      "G(!(!human_available & protected_attr & cv_ready))"
+    ],
+    "t_repair_s": 2.44,
+    "repair_nodes": 2
+  },
+  {
+    "policy_set": "ide_agent_allow_deny",
+    "source": "policies/ide_agent_allow_deny.yaml",
+    "mode": "llm",
+    "rules": 5,
+    "translator": "gemini-2.5-flash",
+    "approximate_rules": [],
+    "t_translate_s": 18.72,
+    "spectra": "out_v2/ide_agent_allow_deny.llm.spectra",
+    "realizable": false,
+    "t_check_s": 1.5,
+    "y_sat": true,
+    "core_rules": [
+      "G2",
+      "G4"
+    ],
+    "counter_trace": "step 0:  environment: req, matches_deny, user_approved    [not: matches_allow]\n         controller:  no response satisfies every rule:\n             (nothing)    [not: allow]                violates G4\n             allow                                    violates G2",
+    "manual_realizable": false,
+    "manual_core_rules": [
+      "G1",
+      "G2",
+      "G4"
+    ],
+    "agrees_with_manual": false,
+    "agreement": "verdict",
+    "repairs": [
+      "G(!(user_approved & matches_deny))"
+    ],
+    "t_repair_s": 3.24,
+    "repair_nodes": 3
+  },
+  {
+    "policy_set": "incident_pause_resume",
+    "source": "policies/incident_pause_resume.yaml",
+    "mode": "llm",
+    "rules": 6,
+    "translator": "gemini-2.5-flash",
+    "approximate_rules": [],
+    "t_translate_s": 9.19,
+    "spectra": "out_v2/incident_pause_resume.llm.spectra",
+    "realizable": true,
+    "t_check_s": 1.55,
+    "manual_realizable": true,
+    "agrees_with_manual": true,
+    "agreement": "exact"
+  },
+  {
+    "policy_set": "support_refunds",
+    "source": "policies/support_refunds.yaml",
+    "mode": "llm",
+    "rules": 5,
+    "translator": "gemini-2.5-flash",
+    "approximate_rules": [],
+    "t_translate_s": 7.83,
+    "spectra": "out_v2/support_refunds.llm.spectra",
+    "realizable": true,
+    "t_check_s": 1.83,
+    "manual_realizable": true,
+    "agrees_with_manual": true,
+    "agreement": "exact"
+  },
+  {
+    "policy_set": "tool_budget_kill_switch",
+    "source": "policies/tool_budget_kill_switch.yaml",
+    "mode": "llm",
+    "rules": 4,
+    "translator": "gemini-3.1-flash-lite",
+    "approximate_rules": [
+      "G4"
+    ],
+    "t_translate_s": 2.68,
+    "spectra": "out_v2/tool_budget_kill_switch.llm.spectra",
+    "realizable": false,
+    "t_check_s": 2.0,
+    "y_sat": true,
+    "core_rules": [
+      "G1",
+      "G3",
+      "G4"
+    ],
+    "counter_trace": "step 0:  environment: req_tool, essential, budget_exhausted    [not: kill_switch]\n         controller:  no response satisfies every rule:\n             (nothing)    [not: allow, deny]          violates G1, G3, G4\n             deny    [not: allow]                     violates G4\n             allow    [not: deny]                     violates G3\n             allow, deny                              violates G1",
+    "manual_realizable": false,
+    "manual_core_rules": [
+      "G3",
+      "G4"
+    ],
+    "agrees_with_manual": false,
+    "agreement": "verdict",
+    "repairs": [
+      "G(!(req_tool & budget_exhausted & !kill_switch & essential))"
+    ],
+    "t_repair_s": 3.69,
+    "repair_nodes": 3
+  },
+  {
+    "policy_set": "trading_agent_guard",
+    "source": "policies/trading_agent_guard.yaml",
+    "mode": "llm",
+    "rules": 6,
+    "translator": "gemini-3.1-flash-lite",
+    "approximate_rules": [],
+    "t_translate_s": 2.73,
+    "spectra": "out_v2/trading_agent_guard.llm.spectra",
+    "realizable": false,
+    "t_check_s": 1.62,
+    "y_sat": true,
+    "core_rules": [
+      "G1",
+      "G2",
+      "G4",
+      "G5"
+    ],
+    "counter_trace": "step 0:  environment: req_trade, market_halt, officer_ok    [not: over_limit]\n         controller:  queue    [not: execute, reject]\nstep 1:  environment: req_trade, market_halt, officer_ok    [not: over_limit]\n         controller:  no response satisfies every rule:\n             (nothing)    [not: execute, reject, queue] violates G1\n             reject    [not: execute, queue]          violates G5\n             execute    [not: reject, queue]          violates G2\n             execute, reject    [not: queue]          violates G1, G2, G5\n             queue    [not: execute, reject]          violates G4\n             reject, queue    [not: execute]          violates G1, G4, G5\n             execute, queue    [not: reject]          violates G1, G2, G4\n             execute, reject, queue                   violates G1, G2, G4, G5",
+    "manual_realizable": false,
+    "manual_core_rules": [
+      "G1",
+      "G2",
+      "G4",
+      "G5"
+    ],
+    "agrees_with_manual": true,
+    "agreement": "exact",
+    "repairs": [
+      "G(!(officer_ok & market_halt & req_trade))"
+    ],
+    "t_repair_s": 2.6,
+    "repair_nodes": 2
+  },
+  {
+    "policy_set": "trusted_editing",
+    "source": "policies/trusted_editing.yaml",
+    "mode": "llm",
+    "rules": 5,
+    "translator": "gemini-3.1-flash-lite",
+    "approximate_rules": [],
+    "t_translate_s": 3.98,
+    "spectra": "out_v2/trusted_editing.llm.spectra",
+    "realizable": true,
+    "t_check_s": 1.53,
+    "manual_realizable": true,
+    "agrees_with_manual": true,
+    "agreement": "exact"
+  },
+  {
+    "policy_set": "trusted_monitoring",
+    "source": "policies/trusted_monitoring.yaml",
+    "mode": "llm",
+    "rules": 5,
+    "translator": "gemini-3.1-flash-lite",
+    "approximate_rules": [],
+    "t_translate_s": 3.37,
+    "spectra": "out_v2/trusted_monitoring.llm.spectra",
+    "realizable": false,
+    "t_check_s": 1.53,
+    "y_sat": true,
+    "core_rules": [
+      "G1",
+      "G2",
+      "G3",
+      "G4"
+    ],
+    "counter_trace": "step 0:  environment: output_ready, flagged, budget_exhausted    [not: trusted_available]\n         controller:  no response satisfies every rule:\n             (nothing)    [not: use_untrusted, defer_trusted, audit] violates G1\n             audit    [not: use_untrusted, defer_trusted] violates G3\n             defer_trusted    [not: use_untrusted, audit] violates G4\n             defer_trusted, audit    [not: use_untrusted] violates G1, G3, G4\n             use_untrusted    [not: defer_trusted, audit] violates G2\n             use_untrusted, audit    [not: defer_trusted] violates G1, G2, G3\n             use_untrusted, defer_trusted    [not: audit] violates G1, G2, G4\n             use_untrusted, defer_trusted, audit      violates G1, G2, G3, G4",
+    "manual_realizable": false,
+    "manual_core_rules": [
+      "G1",
+      "G2",
+      "G3",
+      "G4"
+    ],
+    "agrees_with_manual": true,
+    "agreement": "exact",
+    "repairs": [
+      "G(!(!trusted_available & budget_exhausted & flagged & output_ready))"
+    ],
+    "t_repair_s": 2.76,
+    "repair_nodes": 3
+  },
+  {
+    "policy_set": "trusted_monitoring_fixed",
+    "source": "policies/trusted_monitoring_fixed.yaml",
+    "mode": "llm",
+    "rules": 5,
+    "translator": "gemini-3.1-flash-lite",
+    "approximate_rules": [],
+    "t_translate_s": 2.83,
+    "spectra": "out_v2/trusted_monitoring_fixed.llm.spectra",
+    "realizable": true,
+    "t_check_s": 1.58,
+    "manual_realizable": true,
+    "agrees_with_manual": true,
+    "agreement": "exact"
+  },
+  {
+    "policy_set": "untrusted_monitoring_honeypots",
+    "source": "policies/untrusted_monitoring_honeypots.yaml",
+    "mode": "llm",
+    "rules": 5,
+    "translator": "gemini-3.1-flash-lite",
+    "approximate_rules": [],
+    "t_translate_s": 3.11,
+    "spectra": "out_v2/untrusted_monitoring_honeypots.llm.spectra",
+    "realizable": false,
+    "t_check_s": 1.6,
+    "y_sat": true,
+    "core_rules": [
+      "G1",
+      "G2",
+      "G5"
+    ],
+    "counter_trace": "step 0:  environment: output_ready, honeypot, budget_exhausted    [not: monitor_flagged]\n         controller:  no response satisfies every rule:\n             (nothing)    [not: ship, audit]          violates G1\n             audit    [not: ship]                     violates G5\n             ship    [not: audit]                     violates G2\n             ship, audit                              violates G1, G2, G5",
+    "manual_realizable": false,
+    "manual_core_rules": [
+      "G1",
+      "G2",
+      "G5"
+    ],
+    "agrees_with_manual": true,
+    "agreement": "exact",
+    "repairs": [
+      "G(!(budget_exhausted & output_ready & honeypot))"
+    ],
+    "t_repair_s": 2.77,
+    "repair_nodes": 3
+  },
+  {
+    "policy_set": "vehicle_remote_ops",
+    "source": "policies/vehicle_remote_ops.yaml",
+    "mode": "llm",
+    "rules": 4,
+    "translator": "gemini-3.1-flash-lite",
+    "approximate_rules": [],
+    "t_translate_s": 4.39,
+    "spectra": "out_v2/vehicle_remote_ops.llm.spectra",
+    "realizable": false,
+    "t_check_s": 1.55,
+    "y_sat": true,
+    "core_rules": [
+      "G1",
+      "G3",
+      "G4"
+    ],
+    "counter_trace": "step 0:  environment: operator_stop, low_battery    [not: obstacle]\n         controller:  no response satisfies every rule:\n             (nothing)    [not: stop, return_home]    violates G3, G4\n             return_home    [not: stop]               violates G3\n             stop    [not: return_home]               violates G4\n             stop, return_home                        violates G1",
+    "manual_realizable": false,
+    "manual_core_rules": [
+      "G1",
+      "G3",
+      "G4"
+    ],
+    "agrees_with_manual": true,
+    "agreement": "exact",
+    "repairs": [
+      "G(!(low_battery & operator_stop))"
+    ],
+    "t_repair_s": 3.28,
+    "repair_nodes": 2
+  }
+]

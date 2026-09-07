@@ -1,0 +1,30 @@
+module drone_geofence
+
+env boolean near_boundary;
+env boolean wind_high;
+env boolean gps_lost;
+sys boolean continue;
+sys boolean hover;
+sys boolean land;
+
+// G1
+guarantee
+	G (continue | hover | land);
+// G1
+guarantee
+	G (!(continue & hover));
+// G1
+guarantee
+	G (!(continue & land));
+// G1
+guarantee
+	G (!(hover & land));
+// G2
+guarantee
+	G ((gps_lost | near_boundary) -> !continue);
+// G3
+guarantee
+	G (wind_high -> !hover);
+// G4
+guarantee
+	G ((!gps_lost & !near_boundary & !wind_high) -> continue);

@@ -1,0 +1,34 @@
+module untrusted_monitoring_honeypots
+
+env boolean output_ready;
+env boolean honeypot;
+env boolean monitor_flagged;
+env boolean budget_exhausted;
+sys boolean ship;
+sys boolean audit;
+sys boolean shutdown;
+
+// G1
+guarantee
+	G (output_ready -> (ship | audit));
+// G1
+guarantee
+	G (!(ship & audit));
+// G1
+guarantee
+	G (!output_ready -> (!ship & !audit));
+// G2
+guarantee
+	G (honeypot -> !ship);
+// G3
+guarantee
+	G ((honeypot & !monitor_flagged) -> shutdown);
+// G4
+guarantee
+	G (shutdown -> (honeypot & !monitor_flagged));
+// G5
+guarantee
+	G ((output_ready & monitor_flagged & !budget_exhausted) -> audit);
+// G5
+guarantee
+	G (budget_exhausted -> !audit);

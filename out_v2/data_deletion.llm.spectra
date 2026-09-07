@@ -1,0 +1,33 @@
+module data_deletion
+
+env boolean req_delete;
+env boolean user_request;
+env boolean legal_hold;
+sys boolean delete;
+sys boolean retain;
+sys boolean escalate;
+
+// G1
+guarantee
+	G (req_delete -> (delete | retain | escalate));
+// G1
+guarantee
+	G (!(delete & retain));
+// G1
+guarantee
+	G (!(delete & escalate));
+// G1
+guarantee
+	G (!(retain & escalate));
+// G1
+guarantee
+	G (!req_delete -> (!delete & !retain & !escalate));
+// G2
+guarantee
+	G (legal_hold -> !delete);
+// G3
+guarantee
+	G ((req_delete & user_request) -> !retain);
+// G4
+guarantee
+	G ((req_delete & !legal_hold & user_request) -> delete);

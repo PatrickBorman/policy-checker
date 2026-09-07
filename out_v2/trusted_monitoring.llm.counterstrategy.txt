@@ -1,0 +1,23 @@
+Found 3 unrealizable core system variables.
+At line 7 variable use_untrusted.
+At line 8 variable defer_trusted.
+At line 9 variable audit.
+
+Initial Dead State Sf0 <output_ready:true, flagged:true, trusted_available:false, budget_exhausted:true, use_untrusted:false, defer_trusted:false, audit:false>
+	With successors : Sf8
+Initial Dead State Sf1 <output_ready:true, flagged:true, trusted_available:false, budget_exhausted:true, use_untrusted:false, defer_trusted:false, audit:true>
+	With successors : Sf8
+Initial Dead State Sf2 <output_ready:true, flagged:true, trusted_available:false, budget_exhausted:true, use_untrusted:false, defer_trusted:true, audit:false>
+	With successors : Sf8
+Initial Dead State Sf3 <output_ready:true, flagged:true, trusted_available:false, budget_exhausted:true, use_untrusted:false, defer_trusted:true, audit:true>
+	With successors : Sf8
+Initial Dead State Sf4 <output_ready:true, flagged:true, trusted_available:false, budget_exhausted:true, use_untrusted:true, defer_trusted:false, audit:false>
+	With successors : Sf8
+Initial Dead State Sf5 <output_ready:true, flagged:true, trusted_available:false, budget_exhausted:true, use_untrusted:true, defer_trusted:false, audit:true>
+	With successors : Sf8
+Initial Dead State Sf6 <output_ready:true, flagged:true, trusted_available:false, budget_exhausted:true, use_untrusted:true, defer_trusted:true, audit:false>
+	With successors : Sf8
+Initial Dead State Sf7 <output_ready:true, flagged:true, trusted_available:false, budget_exhausted:true, use_untrusted:true, defer_trusted:true, audit:true>
+	With successors : Sf8
+Dead State Sf8 <output_ready:false, flagged:false, trusted_available:false, budget_exhausted:true>
+	With no successors.

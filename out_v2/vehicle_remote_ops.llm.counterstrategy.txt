@@ -1,0 +1,14 @@
+Found 2 unrealizable core system variables.
+At line 7 variable stop.
+At line 8 variable return_home.
+
+Initial Dead State Sf0 <obstacle:false, operator_stop:true, low_battery:true, stop:false, return_home:false>
+	With successors : Sf4
+Initial Dead State Sf1 <obstacle:false, operator_stop:true, low_battery:true, stop:false, return_home:true>
+	With successors : Sf4
+Initial Dead State Sf2 <obstacle:false, operator_stop:true, low_battery:true, stop:true, return_home:false>
+	With successors : Sf4
+Initial Dead State Sf3 <obstacle:false, operator_stop:true, low_battery:true, stop:true, return_home:true>
+	With successors : Sf4
+Dead State Sf4 <obstacle:false, operator_stop:false, low_battery:false>
+	With no successors.

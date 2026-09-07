@@ -1,0 +1,9 @@
+Found 1 unrealizable core system variables.
+At line 7 variable allow.
+
+Initial Dead State Sf0 <req:true, matches_allow:false, matches_deny:true, user_approved:true, allow:false>
+	With successors : Sf2
+Initial Dead State Sf1 <req:true, matches_allow:false, matches_deny:true, user_approved:true, allow:true>
+	With successors : Sf2
+Dead State Sf2 <req:false, matches_allow:false, matches_deny:false, user_approved:false>
+	With no successors.

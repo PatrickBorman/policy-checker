@@ -1,0 +1,36 @@
+module break_glass_access
+
+env boolean req_elevated;
+env boolean approved;
+env boolean emergency;
+sys boolean grant;
+sys boolean deny;
+sys boolean hold;
+
+// G1
+guarantee
+	G (req_elevated -> (grant | deny | hold));
+// G1
+guarantee
+	G (!(grant & deny));
+// G1
+guarantee
+	G (!(grant & hold));
+// G1
+guarantee
+	G (!(deny & hold));
+// G1
+guarantee
+	G (!req_elevated -> (!grant & !deny & !hold));
+// G2
+guarantee
+	G (grant -> approved);
+// G3
+guarantee
+	G ((req_elevated & emergency) -> grant);
+// G4
+guarantee
+	G (hold -> !next(hold));
+// A1
+assumption
+	G (approved -> req_elevated);

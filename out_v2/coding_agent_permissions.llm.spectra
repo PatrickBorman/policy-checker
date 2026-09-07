@@ -1,0 +1,31 @@
+module coding_agent_permissions
+
+env boolean req_shell;
+env boolean req_write;
+env boolean in_sandbox;
+env boolean user_approved;
+sys boolean allow;
+sys boolean deny;
+sys boolean ask;
+
+// G1
+guarantee
+	G ((req_shell | req_write) -> (allow | deny | ask));
+// G1
+guarantee
+	G ((req_shell | req_write) -> (!(allow & deny) & !(allow & ask) & !(deny & ask)));
+// G1
+guarantee
+	G (!(req_shell | req_write) -> (!allow & !deny & !ask));
+// G2
+guarantee
+	G ((req_shell & !in_sandbox & !user_approved) -> !allow);
+// G3
+guarantee
+	G ((req_write & in_sandbox) -> allow);
+// G4
+guarantee
+	G (user_approved -> allow);
+// A1
+assumption
+	G (!(req_shell | req_write) -> !user_approved);

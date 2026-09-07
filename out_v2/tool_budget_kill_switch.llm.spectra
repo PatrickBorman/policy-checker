@@ -1,0 +1,27 @@
+module tool_budget_kill_switch
+
+env boolean req_tool;
+env boolean essential;
+env boolean budget_exhausted;
+env boolean kill_switch;
+sys boolean allow;
+sys boolean deny;
+
+// G1
+guarantee
+	G (req_tool -> (allow | deny));
+// G1
+guarantee
+	G (!(allow & deny));
+// G1
+guarantee
+	G (!req_tool -> (!allow & !deny));
+// G2
+guarantee
+	G ((req_tool & kill_switch) -> deny);
+// G3
+guarantee
+	G ((req_tool & budget_exhausted) -> deny);
+// G4 (approximate)
+guarantee
+	G ((req_tool & essential & !kill_switch) -> allow);

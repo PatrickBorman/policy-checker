@@ -57,7 +57,7 @@ different conflict.
 | 1, prompt v1 | gemini-3.5-flash | 19 | 18 | 1 | 0 |
 | 1, prompt v1 | gemini-2.5-flash (quota fallback) | 4 | 2 | 0 | **2** |
 | 2, prompt v2 | re-run of the failures on gemini-2.5-flash | — | — | — | **0** |
-| **final** | mixed | **23** | **21** | **2** | **0** |
+| 3, prompt v2, fresh translations of all 23 | gemini-2.5-flash (15) + gemini-3.1-flash-lite (8, quota fallback) | 23 | 21 | 2 | **0** |
 
 Both run-1 failures were the same mistake: an obligation on requests ("when the kill switch is engaged, every
 call is denied") was encoded unconditionally, `G (kill_switch -> deny)`, which forces a decision in steps with
@@ -65,8 +65,10 @@ nothing to decide and manufactures a conflict with the "nothing without a reques
 the prompt (put the request variable in the antecedent of positive obligations) removed it. 108 rules, zero
 validator corrections needed, zero undeclared variables, four rules self-flagged as approximate.
 
-Also: 12 of the 12 LLM-encoded unrealisable sets were repaired by the engine, with the same assumptions as the
-hand-written ones.
+Run 3 is the clean number: every set re-translated from scratch under prompt v2 by the two *weakest* models in
+the chain, no cached translations, no hand intervention - 23/23 verdicts agree with the reference, 21/23 cores
+identical, and the engine repaired all 12 LLM-encoded conflicts. The two "verdict" cases are the same two sets
+each time: equivalent encodings that expose the conflict through a different rule subset.
 
 Times per set: translation median 5.6 s (free tier), realisability check 1.2 s, repair 2.1 s.
 

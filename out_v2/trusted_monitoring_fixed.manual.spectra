@@ -1,0 +1,34 @@
+module trusted_monitoring_fixed
+
+env boolean output_ready;
+env boolean flagged;
+env boolean budget_exhausted;
+env boolean trusted_available;
+sys boolean use_untrusted;
+sys boolean defer_trusted;
+sys boolean audit;
+
+// G1
+guarantee
+	G (output_ready -> (use_untrusted | defer_trusted | audit));
+// G1
+guarantee
+	G (!(use_untrusted & defer_trusted) & !(use_untrusted & audit) & !(defer_trusted & audit));
+// G1
+guarantee
+	G (!output_ready -> (!use_untrusted & !defer_trusted & !audit));
+// G2
+guarantee
+	G ((output_ready & flagged) -> !use_untrusted);
+// G3
+guarantee
+	G ((output_ready & flagged & !budget_exhausted) -> audit);
+// G4
+guarantee
+	G ((output_ready & flagged & budget_exhausted) -> defer_trusted);
+// G4
+guarantee
+	G (budget_exhausted -> !audit);
+// A1
+assumption
+	G (trusted_available);

@@ -1,0 +1,2 @@
+Filename,NumRepairs,RepairLimit,TimeToFirst,Runtime,Timeout,TimedOut,NodesExplored,DuplicateNodes,NumInterpolantsComputed,NumNonStateSeparable
+/Users/patrickborman/Documents/policy-checker/out_v2/tool_budget_kill_switch.llm.spectra,1,1,0.6164440469999999,0.6171210609999997,120.0,False,3,0,2,0

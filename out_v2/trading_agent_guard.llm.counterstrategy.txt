@@ -1,0 +1,25 @@
+Found 3 unrealizable core system variables.
+At line 7 variable execute.
+At line 8 variable reject.
+At line 9 variable queue.
+
+Initial Dead State Sf0 <req_trade:true, over_limit:false, market_halt:true, officer_ok:true, execute:false, reject:false, queue:false>
+	With successors : Sf9
+Initial State S1 <req_trade:true, over_limit:false, market_halt:true, officer_ok:true, execute:false, reject:false, queue:true>
+	With successors : Sf0, Sf2, Sf4, Sf6
+Initial Dead State Sf2 <req_trade:true, over_limit:false, market_halt:true, officer_ok:true, execute:false, reject:true, queue:false>
+	With successors : Sf9
+Initial Dead State Sf3 <req_trade:true, over_limit:false, market_halt:true, officer_ok:true, execute:false, reject:true, queue:true>
+	With successors : Sf8
+Initial Dead State Sf4 <req_trade:true, over_limit:false, market_halt:true, officer_ok:true, execute:true, reject:false, queue:false>
+	With successors : Sf9
+Initial Dead State Sf5 <req_trade:true, over_limit:false, market_halt:true, officer_ok:true, execute:true, reject:false, queue:true>
+	With successors : Sf8
+Initial Dead State Sf6 <req_trade:true, over_limit:false, market_halt:true, officer_ok:true, execute:true, reject:true, queue:false>
+	With successors : Sf9
+Initial Dead State Sf7 <req_trade:true, over_limit:false, market_halt:true, officer_ok:true, execute:true, reject:true, queue:true>
+	With successors : Sf8
+Dead State Sf8 <req_trade:true, over_limit:false, market_halt:false, officer_ok:false>
+	With no successors.
+Dead State Sf9 <req_trade:false, over_limit:false, market_halt:false, officer_ok:false>
+	With no successors.

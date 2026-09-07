@@ -1,0 +1,34 @@
+module clinical_triage
+
+env boolean case_ready;
+env boolean urgent;
+env boolean low_confidence;
+env boolean clinician_available;
+sys boolean recommend;
+sys boolean escalate;
+sys boolean hold;
+
+// G1
+guarantee
+	G (case_ready -> (recommend | escalate | hold));
+// G1
+guarantee
+	G (!(recommend & escalate));
+// G1
+guarantee
+	G (!(recommend & hold));
+// G1
+guarantee
+	G (!(escalate & hold));
+// G1
+guarantee
+	G (!case_ready -> (!recommend & !escalate & !hold));
+// G2
+guarantee
+	G (low_confidence -> !recommend);
+// G3
+guarantee
+	G (urgent -> !hold);
+// G4
+guarantee
+	G (escalate -> clinician_available);

@@ -1,0 +1,34 @@
+module browsing_agent_pii
+
+env boolean req_submit;
+env boolean external;
+env boolean contains_pii;
+env boolean user_present;
+sys boolean allow;
+sys boolean block;
+sys boolean ask;
+
+// G1
+guarantee
+	G (req_submit -> (allow | block | ask));
+// G1
+guarantee
+	G (!(allow & block));
+// G1
+guarantee
+	G (!(allow & ask));
+// G1
+guarantee
+	G (!(block & ask));
+// G1
+guarantee
+	G (!req_submit -> (!allow & !block & !ask));
+// G2
+guarantee
+	G ((req_submit & contains_pii & external & !ask) -> !allow);
+// G3
+guarantee
+	G (!user_present -> !ask);
+// G4
+guarantee
+	G ((req_submit & !external & !contains_pii) -> (allow & !ask));

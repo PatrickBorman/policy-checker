@@ -1,0 +1,40 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((proceed | stop | return_home) & !(proceed & stop) & !(proceed & return_home) & !(stop & return_home))"
+      ],
+      "note": "Ensures exactly one action is chosen in every step.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G (obstacle -> !proceed)"
+      ],
+      "note": "Prohibits proceeding when an obstacle is detected.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G (operator_stop -> stop)"
+      ],
+      "note": "Forces the stop action when the operator commands it.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G (low_battery -> return_home)"
+      ],
+      "note": "Forces the return_home action when battery is low.",
+      "approximate": false
+    }
+  ]
+}

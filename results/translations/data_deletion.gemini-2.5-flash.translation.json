@@ -1,0 +1,44 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (req_delete -> (delete | retain | escalate))",
+        "G (!(delete & retain))",
+        "G (!(delete & escalate))",
+        "G (!(retain & escalate))",
+        "G (!req_delete -> (!delete & !retain & !escalate))"
+      ],
+      "note": "Every request leads to exactly one decision; no decision without a request.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G (legal_hold -> !delete)"
+      ],
+      "note": "Deletion is forbidden if data is under legal hold.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((req_delete & user_request) -> !retain)"
+      ],
+      "note": "A data subject's request must not be refused; it must be deleted or escalated.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((req_delete & !legal_hold & user_request) -> delete)"
+      ],
+      "note": "User requests not under legal hold must be deleted (implying no escalation or retention due to G1).",
+      "approximate": false
+    }
+  ]
+}

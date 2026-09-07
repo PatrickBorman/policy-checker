@@ -1,0 +1,58 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (incident -> pause)"
+      ],
+      "note": "An incident detected in the current step causes a pause in the same step.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((incident & severity_high) -> notify)"
+      ],
+      "note": "A high-severity incident detected in the current step causes a notification in the same step.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G (resume -> (!incident & human_ack))"
+      ],
+      "note": "Resuming is prohibited if there is an incident or no human acknowledgement in the same step.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G (!(pause & resume))"
+      ],
+      "note": "Pause and resume actions are mutually exclusive in any given step.",
+      "approximate": false
+    },
+    {
+      "id": "G5",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((human_ack & !incident & paused) -> resume)"
+      ],
+      "note": "If the agent is paused, and there's a human acknowledgement and no incident, the agent must resume.",
+      "approximate": false
+    },
+    {
+      "id": "A1",
+      "kind": "assumption",
+      "spectra": [
+        "G (next(paused) <-> (pause | (paused & !resume)))"
+      ],
+      "note": "The 'paused' state becomes true if 'pause' is issued, or remains true if already paused and 'resume' is not issued.",
+      "approximate": false
+    }
+  ]
+}

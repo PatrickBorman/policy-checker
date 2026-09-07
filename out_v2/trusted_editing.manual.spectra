@@ -1,0 +1,31 @@
+module trusted_editing
+
+env boolean output_ready;
+env boolean flagged;
+env boolean high_suspicion;
+env boolean budget_exhausted;
+sys boolean ship_untrusted;
+sys boolean ship_edited;
+sys boolean audit;
+
+// G1
+guarantee
+	G (output_ready -> (ship_untrusted | ship_edited | audit));
+// G1
+guarantee
+	G (!(ship_untrusted & ship_edited) & !(ship_untrusted & audit) & !(ship_edited & audit));
+// G1
+guarantee
+	G (!output_ready -> (!ship_untrusted & !ship_edited & !audit));
+// G2
+guarantee
+	G ((output_ready & flagged) -> !ship_untrusted);
+// G3
+guarantee
+	G ((output_ready & high_suspicion & !budget_exhausted) -> audit);
+// G4
+guarantee
+	G (budget_exhausted -> !audit);
+// A1
+assumption
+	G (high_suspicion -> flagged);

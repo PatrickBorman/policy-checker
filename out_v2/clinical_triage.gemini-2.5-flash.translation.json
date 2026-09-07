@@ -1,0 +1,44 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (case_ready -> (recommend | escalate | hold))",
+        "G (!(recommend & escalate))",
+        "G (!(recommend & hold))",
+        "G (!(escalate & hold))",
+        "G (!case_ready -> (!recommend & !escalate & !hold))"
+      ],
+      "note": "Encodes that every case gets exactly one decision, and no decision is made without a case.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G (low_confidence -> !recommend)"
+      ],
+      "note": "Prohibits issuing a recommendation when confidence is low.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G (urgent -> !hold)"
+      ],
+      "note": "Prohibits holding cases that are flagged as urgent.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G (escalate -> clinician_available)"
+      ],
+      "note": "Requires a clinician to be available for a case to be escalated.",
+      "approximate": false
+    }
+  ]
+}

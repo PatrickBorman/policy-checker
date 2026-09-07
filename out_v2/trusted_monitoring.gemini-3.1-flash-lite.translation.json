@@ -1,0 +1,51 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (output_ready -> (use_untrusted | defer_trusted | audit))",
+        "G (output_ready -> !(use_untrusted & defer_trusted) & !(use_untrusted & audit) & !(defer_trusted & audit))",
+        "G (!output_ready -> (!use_untrusted & !defer_trusted & !audit))"
+      ],
+      "note": "Ensures exactly one action is taken when output is ready, and no action when it is not.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((output_ready & flagged) -> !use_untrusted)"
+      ],
+      "note": "Prohibits shipping untrusted outputs that are flagged.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G (budget_exhausted -> !audit)"
+      ],
+      "note": "Prohibits auditing when the budget is exhausted.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G (!trusted_available -> !defer_trusted)"
+      ],
+      "note": "Prohibits deferring to the trusted model when it is unavailable.",
+      "approximate": false
+    },
+    {
+      "id": "A1",
+      "kind": "assumption",
+      "spectra": [
+        "G (budget_exhausted -> next(budget_exhausted))"
+      ],
+      "note": "Ensures the budget exhaustion state is persistent.",
+      "approximate": false
+    }
+  ]
+}

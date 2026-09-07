@@ -1,0 +1,14 @@
+Found 2 unrealizable core system variables.
+At line 7 variable ship.
+At line 8 variable audit.
+
+Initial Dead State Sf0 <output_ready:true, honeypot:true, monitor_flagged:false, budget_exhausted:true, ship:false, audit:false>
+	With successors : Sf4
+Initial Dead State Sf1 <output_ready:true, honeypot:true, monitor_flagged:false, budget_exhausted:true, ship:false, audit:true>
+	With successors : Sf4
+Initial Dead State Sf2 <output_ready:true, honeypot:true, monitor_flagged:false, budget_exhausted:true, ship:true, audit:false>
+	With successors : Sf4
+Initial Dead State Sf3 <output_ready:true, honeypot:true, monitor_flagged:false, budget_exhausted:true, ship:true, audit:true>
+	With successors : Sf4
+Dead State Sf4 <output_ready:false, honeypot:false, monitor_flagged:false, budget_exhausted:false>
+	With no successors.

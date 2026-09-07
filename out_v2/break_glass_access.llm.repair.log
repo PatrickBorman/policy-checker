@@ -1,0 +1,66 @@
+Using BDD Package: CUDDFactory, Version: CUDD 3.0
+Using BDD Package: CUDDFactory, Version: CUDD 3.0
+
+
+=== ARGS ===
+ALL GARS: False
+MINIMIZE SPEC: True
+USE INFLUENTIAL: True
+TIMEOUT: 120.0
+REPAIR LIMIT: 1
+
+
+++++ ELAPSED TIME: 3.1900000010409713e-06
+++++ QUEUE LENGTH: 0
+++++ Solutions: 0
+++++ Duplicates: 0
+++++ Node number: 1
+++++ Refinement: []
+++++ Length: 0
+++ Y-SAT CHECK
+++ REALIZABILITY CHECK
+++ COUNTERSTRATEGY COMPUTATION - REFINEMENT GENERATION
+MADE IT HERE
+MADE IT HERE
+
+=== COUNTERRUN ===
+Sf1 -> Sf2
+
+
+=== INTERPOLANT ===
+(!approved__Sf1 & emergency__Sf1 & req_elevated__Sf1)
+
+
+++++ ELAPSED TIME: 0.32034980800000135
+++++ QUEUE LENGTH: 1
+++++ Solutions: 0
+++++ Duplicates: 0
+++++ Node number: 2
+++++ Refinement: ['!(req_elevated & emergency & !approved)']
+++++ Length: 1
+++ Y-SAT CHECK
+++ REALIZABILITY CHECK
+++ COUNTERSTRATEGY COMPUTATION - REFINEMENT GENERATION
+MADE IT HERE
+MADE IT HERE
+
+=== COUNTERRUN ===
+S0 -> Sf3 -> Sf2
+
+
+=== INTERPOLANT ===
+(!approved__Sf3 & emergency__Sf3 & req_elevated__Sf3)
+
+
+++++ ELAPSED TIME: 0.5200224490000007
+++++ QUEUE LENGTH: 1
+++++ Solutions: 0
+++++ Duplicates: 0
+++++ Node number: 3
+++++ Refinement: ['G(!(req_elevated & emergency & !approved))']
+++++ Length: 1
+++ Y-SAT CHECK
+++ REALIZABILITY CHECK
+++ REALIZABLE REFINEMENT: SAT CHECK
+
+++++ SAVING SEARCH SUMMARY DATA

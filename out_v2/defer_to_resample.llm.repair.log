@@ -1,0 +1,45 @@
+Using BDD Package: CUDDFactory, Version: CUDD 3.0
+Using BDD Package: CUDDFactory, Version: CUDD 3.0
+
+
+=== ARGS ===
+ALL GARS: False
+MINIMIZE SPEC: True
+USE INFLUENTIAL: True
+TIMEOUT: 120.0
+REPAIR LIMIT: 1
+
+
+++++ ELAPSED TIME: 7.183999999771373e-06
+++++ QUEUE LENGTH: 0
+++++ Solutions: 0
+++++ Duplicates: 0
+++++ Node number: 1
+++++ Refinement: []
+++++ Length: 0
+++ Y-SAT CHECK
+++ REALIZABILITY CHECK
+++ COUNTERSTRATEGY COMPUTATION - REFINEMENT GENERATION
+MADE IT HERE
+MADE IT HERE
+
+=== COUNTERRUN ===
+S2 -> Sf5 -> Sf9
+
+
+=== INTERPOLANT ===
+(flagged__Sf5 & output_ready__Sf5 & !resample__Sf5 & !trusted_available__Sf5)
+
+
+++++ ELAPSED TIME: 0.3053111479999999
+++++ QUEUE LENGTH: 0
+++++ Solutions: 0
+++++ Duplicates: 0
+++++ Node number: 2
+++++ Refinement: ['G(!(flagged & output_ready & !trusted_available))']
+++++ Length: 1
+++ Y-SAT CHECK
+++ REALIZABILITY CHECK
+++ REALIZABLE REFINEMENT: SAT CHECK
+
+++++ SAVING SEARCH SUMMARY DATA

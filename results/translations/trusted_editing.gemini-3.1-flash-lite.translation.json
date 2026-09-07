@@ -1,0 +1,51 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (output_ready -> (ship_untrusted | ship_edited | audit))",
+        "G (!(ship_untrusted & ship_edited) & !(ship_untrusted & audit) & !(ship_edited & audit))",
+        "G (!output_ready -> (!ship_untrusted & !ship_edited & !audit))"
+      ],
+      "note": "Ensures exactly one action per output and no action without output.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((output_ready & flagged) -> !ship_untrusted)"
+      ],
+      "note": "Prohibits shipping unedited if flagged.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((output_ready & high_suspicion & !budget_exhausted) -> audit)"
+      ],
+      "note": "Mandates audit for highly suspicious outputs when budget is available.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G (budget_exhausted -> !audit)"
+      ],
+      "note": "Prohibits auditing when budget is exhausted.",
+      "approximate": false
+    },
+    {
+      "id": "A1",
+      "kind": "assumption",
+      "spectra": [
+        "G (high_suspicion -> flagged)"
+      ],
+      "note": "Constraint on environment: high suspicion implies flagged.",
+      "approximate": false
+    }
+  ]
+}

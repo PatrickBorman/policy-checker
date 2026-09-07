@@ -1,0 +1,31 @@
+module ai_act_human_oversight
+
+env boolean decision_ready;
+env boolean anomaly;
+env boolean override;
+env boolean human_available;
+sys boolean act_auto;
+sys boolean defer_human;
+sys boolean halt;
+
+// G1
+guarantee
+	G (decision_ready -> (act_auto | defer_human | halt));
+// G1
+guarantee
+	G (!(act_auto & defer_human) & !(act_auto & halt) & !(defer_human & halt));
+// G1
+guarantee
+	G (!decision_ready -> (!act_auto & !defer_human & !halt));
+// G2
+guarantee
+	G (anomaly -> !act_auto);
+// G3
+guarantee
+	G (override -> !act_auto);
+// G4
+guarantee
+	G (!human_available -> !defer_human);
+// G5
+guarantee
+	G ((decision_ready & !anomaly & !override) -> act_auto);

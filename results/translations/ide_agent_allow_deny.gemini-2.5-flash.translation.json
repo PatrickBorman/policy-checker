@@ -1,0 +1,54 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (req -> (allow | deny | ask))",
+        "G (!(allow & deny))",
+        "G (!(allow & ask))",
+        "G (!(deny & ask))",
+        "G (!req -> (!allow & !deny & !ask))"
+      ],
+      "note": "If there is a request, exactly one decision (allow, deny, or ask) is made; no decision is made without a request.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G (matches_deny -> !allow)",
+        "G (matches_deny -> !ask)"
+      ],
+      "note": "If an action matches a deny rule, it is neither allowed nor asked about.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((req & matches_allow & !matches_deny) -> (allow & !ask))"
+      ],
+      "note": "If a requested action matches an allow rule and no deny rule, it runs and is not asked about.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G (user_approved -> allow)"
+      ],
+      "note": "If the user approved, the action is allowed.",
+      "approximate": false
+    },
+    {
+      "id": "A1",
+      "kind": "assumption",
+      "spectra": [
+        "G (user_approved -> req)"
+      ],
+      "note": "The user only approves when there is an active request.",
+      "approximate": false
+    }
+  ]
+}

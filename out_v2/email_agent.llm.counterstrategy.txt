@@ -1,0 +1,23 @@
+Found 3 unrealizable core system variables.
+At line 6 variable allow.
+At line 7 variable block.
+At line 8 variable escalate.
+
+Initial Dead State Sf0 <req_send:true, user_confirm:false, refund_open:true, allow:false, block:false, escalate:false>
+	With successors : Sf8
+Initial State S1 <req_send:true, user_confirm:false, refund_open:true, allow:false, block:false, escalate:true>
+	With successors : Sf0, Sf2, Sf4, Sf6
+Initial Dead State Sf2 <req_send:true, user_confirm:false, refund_open:true, allow:false, block:true, escalate:false>
+	With successors : Sf8
+Initial Dead State Sf3 <req_send:true, user_confirm:false, refund_open:true, allow:false, block:true, escalate:true>
+	With successors : Sf8
+Initial Dead State Sf4 <req_send:true, user_confirm:false, refund_open:true, allow:true, block:false, escalate:false>
+	With successors : Sf8
+Initial Dead State Sf5 <req_send:true, user_confirm:false, refund_open:true, allow:true, block:false, escalate:true>
+	With successors : Sf8
+Initial Dead State Sf6 <req_send:true, user_confirm:false, refund_open:true, allow:true, block:true, escalate:false>
+	With successors : Sf8
+Initial Dead State Sf7 <req_send:true, user_confirm:false, refund_open:true, allow:true, block:true, escalate:true>
+	With successors : Sf8
+Dead State Sf8 <req_send:false, user_confirm:false, refund_open:false>
+	With no successors.

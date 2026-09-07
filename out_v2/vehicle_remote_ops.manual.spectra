@@ -1,0 +1,24 @@
+module vehicle_remote_ops
+
+env boolean obstacle;
+env boolean operator_stop;
+env boolean low_battery;
+sys boolean proceed;
+sys boolean stop;
+sys boolean return_home;
+
+// G1
+guarantee
+	G (proceed | stop | return_home);
+// G1
+guarantee
+	G (!(proceed & stop) & !(proceed & return_home) & !(stop & return_home));
+// G2
+guarantee
+	G (obstacle -> !proceed);
+// G3
+guarantee
+	G (operator_stop -> stop);
+// G4
+guarantee
+	G (low_battery -> return_home);

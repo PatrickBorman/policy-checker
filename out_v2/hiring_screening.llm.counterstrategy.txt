@@ -1,0 +1,25 @@
+Found 3 unrealizable core system variables.
+At line 6 variable shortlist.
+At line 7 variable reject.
+At line 8 variable hold.
+
+Initial Dead State Sf0 <cv_ready:true, protected_attr:true, human_available:false, shortlist:false, reject:false, hold:false>
+	With successors : Sf9
+Initial State S1 <cv_ready:true, protected_attr:true, human_available:false, shortlist:false, reject:false, hold:true>
+	With successors : Sf0, Sf2, Sf4, Sf6
+Initial Dead State Sf2 <cv_ready:true, protected_attr:true, human_available:false, shortlist:false, reject:true, hold:false>
+	With successors : Sf9
+Initial Dead State Sf3 <cv_ready:true, protected_attr:true, human_available:false, shortlist:false, reject:true, hold:true>
+	With successors : Sf8
+Initial Dead State Sf4 <cv_ready:true, protected_attr:true, human_available:false, shortlist:true, reject:false, hold:false>
+	With successors : Sf9
+Initial Dead State Sf5 <cv_ready:true, protected_attr:true, human_available:false, shortlist:true, reject:false, hold:true>
+	With successors : Sf8
+Initial Dead State Sf6 <cv_ready:true, protected_attr:true, human_available:false, shortlist:true, reject:true, hold:false>
+	With successors : Sf9
+Initial Dead State Sf7 <cv_ready:true, protected_attr:true, human_available:false, shortlist:true, reject:true, hold:true>
+	With successors : Sf8
+Dead State Sf8 <cv_ready:true, protected_attr:true, human_available:false>
+	With no successors.
+Dead State Sf9 <cv_ready:false, protected_attr:false, human_available:false>
+	With no successors.

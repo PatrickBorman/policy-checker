@@ -1,0 +1,2 @@
+Filename,NumRepairs,RepairLimit,TimeToFirst,Runtime,Timeout,TimedOut,NodesExplored,DuplicateNodes,NumInterpolantsComputed,NumNonStateSeparable
+/Users/patrickborman/Documents/policy-checker/out_v2/ide_agent_allow_deny.llm.spectra,1,1,0.43702423099999965,0.43775336399999976,120.0,False,3,0,2,0

@@ -1,0 +1,30 @@
+module email_agent
+
+env boolean req_send;
+env boolean user_confirm;
+env boolean refund_open;
+sys boolean allow;
+sys boolean block;
+sys boolean escalate;
+
+// G1
+guarantee
+	G (req_send -> (allow | block | escalate));
+// G1
+guarantee
+	G (!(allow & block) & !(allow & escalate) & !(block & escalate));
+// G1
+guarantee
+	G (!req_send -> (!allow & !block & !escalate));
+// G2
+guarantee
+	G ((req_send & !user_confirm) -> !allow);
+// G3
+guarantee
+	G (escalate -> !next(escalate));
+// G4
+guarantee
+	G ((refund_open & req_send) -> !block);
+// A1
+assumption
+	G (user_confirm -> req_send);

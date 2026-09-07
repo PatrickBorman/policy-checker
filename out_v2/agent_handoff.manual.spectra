@@ -1,0 +1,31 @@
+module agent_handoff
+
+env boolean task_ready;
+env boolean sensitive;
+env boolean specialist_available;
+env boolean opted_out;
+sys boolean handle;
+sys boolean handoff;
+sys boolean refuse;
+
+// G1
+guarantee
+	G (task_ready -> (handle | handoff | refuse));
+// G1
+guarantee
+	G (!(handle & handoff) & !(handle & refuse) & !(handoff & refuse));
+// G1
+guarantee
+	G (!task_ready -> (!handle & !handoff & !refuse));
+// G2
+guarantee
+	G (sensitive -> !handle);
+// G3
+guarantee
+	G (opted_out -> !handoff);
+// G3
+guarantee
+	G (!specialist_available -> !handoff);
+// G4
+guarantee
+	G ((task_ready & !sensitive) -> !refuse);

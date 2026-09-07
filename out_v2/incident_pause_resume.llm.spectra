@@ -1,0 +1,28 @@
+module incident_pause_resume
+
+env boolean incident;
+env boolean severity_high;
+env boolean human_ack;
+env boolean paused;
+sys boolean pause;
+sys boolean resume;
+sys boolean notify;
+
+// G1
+guarantee
+	G (incident -> pause);
+// G2
+guarantee
+	G ((incident & severity_high) -> notify);
+// G3
+guarantee
+	G (resume -> (!incident & human_ack));
+// G4
+guarantee
+	G (!(pause & resume));
+// G5
+guarantee
+	G ((human_ack & !incident & paused) -> resume);
+// A1
+assumption
+	G (next(paused) <-> (pause | (paused & !resume)));

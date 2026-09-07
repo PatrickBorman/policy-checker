@@ -1,0 +1,53 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (req_elevated -> (grant | deny | hold))",
+        "G (!(grant & deny))",
+        "G (!(grant & hold))",
+        "G (!(deny & hold))",
+        "G (!req_elevated -> (!grant & !deny & !hold))"
+      ],
+      "note": "Every request must result in exactly one decision; no decision without a request.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G (grant -> approved)"
+      ],
+      "note": "Elevated permissions are granted only if an approval is present in the same step.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((req_elevated & emergency) -> grant)"
+      ],
+      "note": "If there is an elevated permission request and an emergency, it must be granted.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G (hold -> !next(hold))"
+      ],
+      "note": "A request cannot be held for two consecutive steps.",
+      "approximate": false
+    },
+    {
+      "id": "A1",
+      "kind": "assumption",
+      "spectra": [
+        "G (approved -> req_elevated)"
+      ],
+      "note": "The environment only provides an approval if there is an active elevated permission request.",
+      "approximate": false
+    }
+  ]
+}

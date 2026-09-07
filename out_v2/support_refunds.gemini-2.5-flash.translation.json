@@ -1,0 +1,53 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (req_refund -> (approve | reject | escalate))",
+        "G (!(approve & reject))",
+        "G (!(approve & escalate))",
+        "G (!(reject & escalate))",
+        "G (!req_refund -> (!approve & !reject & !escalate))"
+      ],
+      "note": "Encodes that every request gets exactly one decision, and no decision is made without a request.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G (fraud_flag -> !approve)"
+      ],
+      "note": "Encodes that approval is forbidden if a fraud flag is present.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((req_refund & amount_high & !manager_ok) -> !approve)"
+      ],
+      "note": "Encodes that high-value refunds cannot be approved without a manager's approval.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G (!verified -> !approve)"
+      ],
+      "note": "Encodes that approval is forbidden for unverified customers.",
+      "approximate": false
+    },
+    {
+      "id": "G5",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((req_refund & verified & !amount_high & !fraud_flag) -> (approve & !escalate))"
+      ],
+      "note": "Encodes that specific conditions lead to approval without escalation.",
+      "approximate": false
+    }
+  ]
+}

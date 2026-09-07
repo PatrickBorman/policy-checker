@@ -1,0 +1,43 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (continue | hover | land)",
+        "G (!(continue & hover))",
+        "G (!(continue & land))",
+        "G (!(hover & land))"
+      ],
+      "note": "Encodes that exactly one of continue, hover, or land must be chosen in every step.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((gps_lost | near_boundary) -> !continue)"
+      ],
+      "note": "Encodes that continuing is forbidden if GPS is lost or the drone is near the boundary.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G (wind_high -> !hover)"
+      ],
+      "note": "Encodes that hovering is forbidden if the wind is high.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((!gps_lost & !near_boundary & !wind_high) -> continue)"
+      ],
+      "note": "Encodes that the drone must continue if GPS is good, not near the boundary, and wind is calm.",
+      "approximate": false
+    }
+  ]
+}

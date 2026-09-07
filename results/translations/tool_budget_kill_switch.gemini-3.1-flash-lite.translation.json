@@ -1,0 +1,42 @@
+{
+  "rules": [
+    {
+      "id": "G1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (req_tool -> (allow | deny))",
+        "G (!(allow & deny))",
+        "G (!req_tool -> (!allow & !deny))"
+      ],
+      "note": "Ensures exactly one decision per request and no decision without a request.",
+      "approximate": false
+    },
+    {
+      "id": "G2",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((req_tool & kill_switch) -> deny)"
+      ],
+      "note": "Kill switch forces denial of any requested tool call.",
+      "approximate": false
+    },
+    {
+      "id": "G3",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((req_tool & budget_exhausted) -> deny)"
+      ],
+      "note": "Exhausted budget forces denial of any requested tool call.",
+      "approximate": false
+    },
+    {
+      "id": "G4",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((req_tool & essential & !kill_switch) -> allow)"
+      ],
+      "note": "Essential calls are allowed unless the kill switch is active; budget exhaustion is not explicitly excluded as an override.",
+      "approximate": true
+    }
+  ]
+}
