@@ -1,0 +1,100 @@
+Using BDD Package: CUDDFactory, Version: CUDD 3.0
+Using BDD Package: CUDDFactory, Version: CUDD 3.0
+
+
+=== ARGS ===
+ALL GARS: False
+MINIMIZE SPEC: True
+USE INFLUENTIAL: True
+TIMEOUT: 120.0
+REPAIR LIMIT: 1
+
+
+++++ ELAPSED TIME: 4.359000000064839e-06
+++++ QUEUE LENGTH: 0
+++++ Solutions: 0
+++++ Duplicates: 0
+++++ Node number: 1
+++++ Refinement: []
+++++ Length: 0
+++ Y-SAT CHECK
+++ REALIZABILITY CHECK
+++ COUNTERSTRATEGY COMPUTATION - REFINEMENT GENERATION
+
+=== COUNTERRUN ===
+Sf0 -> Sf2
+
+
+=== INTERPOLANT ===
+(input_tripwire_triggered__Sf0 & !is_first_agent__Sf0)
+
+
+++++ ELAPSED TIME: 0.1639908240000003
+++++ QUEUE LENGTH: 1
+++++ Solutions: 0
+++++ Duplicates: 0
+++++ Node number: 2
+++++ Refinement: ['!(!is_first_agent & input_tripwire_triggered)']
+++++ Length: 1
+++ Y-SAT CHECK
+++ REALIZABILITY CHECK
+++ COUNTERSTRATEGY COMPUTATION - REFINEMENT GENERATION
+
+=== COUNTERRUN ===
+S1 -> Sf2 -> Sf4
+
+
+=== INTERPOLANT ===
+(input_tripwire_triggered__Sf2 & !is_first_agent__Sf2)
+
+
+++++ ELAPSED TIME: 0.3629565290000003
+++++ QUEUE LENGTH: 1
+++++ Solutions: 0
+++++ Duplicates: 0
+++++ Node number: 3
+++++ Refinement: ['G(!(!is_first_agent & input_tripwire_triggered))']
+++++ Length: 1
+++ Y-SAT CHECK
+++ REALIZABILITY CHECK
+++ COUNTERSTRATEGY COMPUTATION - REFINEMENT GENERATION
+
+=== COUNTERRUN ===
+Sf1 -> Sf2
+
+
+=== INTERPOLANT ===
+(!is_final_agent__Sf1 & output_tripwire_triggered__Sf1)
+
+
+++++ ELAPSED TIME: 0.5257042040000002
+++++ QUEUE LENGTH: 2
+++++ Solutions: 0
+++++ Duplicates: 0
+++++ Node number: 4
+++++ Refinement: ['!(!is_first_agent & input_tripwire_triggered)', 'G(!(!is_first_agent & input_tripwire_triggered))']
+++++ Length: 2
+++ Y-SAT CHECK
+++ REALIZABILITY CHECK
+++ COUNTERSTRATEGY COMPUTATION - REFINEMENT GENERATION
+
+=== COUNTERRUN ===
+Sf0 -> Sf2
+
+
+=== INTERPOLANT ===
+(!is_final_agent__Sf0 & output_tripwire_triggered__Sf0)
+
+
+++++ ELAPSED TIME: 0.6963399160000003
+++++ QUEUE LENGTH: 3
+++++ Solutions: 0
+++++ Duplicates: 0
+++++ Node number: 5
+++++ Refinement: ['G(!(!is_first_agent & input_tripwire_triggered))', 'G(!(output_tripwire_triggered & !is_final_agent))']
+++++ Length: 2
+++ Y-SAT CHECK
+++ REALIZABILITY CHECK
+++ REALIZABLE REFINEMENT: SAT CHECK
+
+++++ SAVING SEARCH SUMMARY DATA

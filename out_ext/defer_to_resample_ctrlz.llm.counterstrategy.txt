@@ -1,0 +1,14 @@
+Found 2 unrealizable core system variables.
+At line 8 variable execute_sample.
+At line 9 variable resample_two.
+
+Initial Dead State Sf0 <initial_score_above_deferral:false, any_sample_below_deferral:false, all_samples_above_deferral:false, min_above_auditing_threshold:true, min_hits_higher_threshold:true, execute_sample:false, resample_two:false>
+	With successors : Sf4
+Initial Dead State Sf1 <initial_score_above_deferral:false, any_sample_below_deferral:false, all_samples_above_deferral:false, min_above_auditing_threshold:true, min_hits_higher_threshold:true, execute_sample:false, resample_two:true>
+	With successors : Sf4
+Initial Dead State Sf2 <initial_score_above_deferral:false, any_sample_below_deferral:false, all_samples_above_deferral:false, min_above_auditing_threshold:true, min_hits_higher_threshold:true, execute_sample:true, resample_two:false>
+	With successors : Sf4
+Initial Dead State Sf3 <initial_score_above_deferral:false, any_sample_below_deferral:false, all_samples_above_deferral:false, min_above_auditing_threshold:true, min_hits_higher_threshold:true, execute_sample:true, resample_two:true>
+	With successors : Sf4
+Dead State Sf4 <initial_score_above_deferral:false, any_sample_below_deferral:false, all_samples_above_deferral:false, min_above_auditing_threshold:false, min_hits_higher_threshold:false>
+	With no successors.

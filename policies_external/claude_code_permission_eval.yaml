@@ -1,0 +1,52 @@
+name: claude_code_permission_eval
+description: Evaluation logic for tool call permissions in Claude Code, incorporating deny/ask/allow rules, hooks,
+  and settings precedence.
+provenance: extracted by gemini-3.1-flash-lite from sources/claude_code_permissions.txt; verbatim source in that
+  file
+env:
+- name: matches_deny_rule
+  desc: The tool call matches a configured deny rule.
+- name: matches_ask_rule
+  desc: The tool call matches a configured ask rule.
+- name: matches_allow_rule
+  desc: The tool call matches a configured allow rule.
+- name: hook_blocks
+  desc: A PreToolUse hook exits with code 2, blocking the call.
+- name: hook_denies
+  desc: A PreToolUse hook returns a deny decision.
+- name: hook_asks
+  desc: A PreToolUse hook returns an ask decision.
+- name: is_end_conversation
+  desc: The tool being called is EndConversation.
+- name: mcp_requires_user_interaction
+  desc: The MCP tool is marked as requiring user interaction.
+- name: connector_set_to_ask
+  desc: The connector tool is configured by the organization to ask.
+sys:
+- name: block
+  desc: The controller blocks the tool call.
+- name: prompt
+  desc: The controller prompts the user for approval.
+- name: proceed
+  desc: The controller allows the tool call to proceed.
+rules:
+- id: hook_block_precedence
+  text: If a hook blocks the call, the controller must block, regardless of other rules.
+  source: A hook that exits with code 2 stops the tool call before permission rules are evaluated, so the block
+    applies even when an allow rule would otherwise let the call proceed.
+- id: deny_rule_precedence
+  text: If the call matches a deny rule, the controller must block.
+  source: A matching deny rule blocks the call
+- id: ask_rule_precedence
+  text: If the call matches an ask rule, the controller must prompt.
+  source: a matching ask rule still prompts even when the hook returned "allow" or "ask".
+- id: mcp_interaction_requirement
+  text: If the tool is an MCP tool requiring interaction or a connector set to ask, the controller must prompt.
+  source: MCP tools marked requiresUserInteraction also still prompt when a hook returns "allow", as do connector
+    tools your organization set to ask
+- id: allow_rule_fallback
+  text: If no deny or ask conditions are met, the controller must proceed if an allow rule matches.
+  source: The first match in that order determines the outcome
+- id: end_conversation_exception
+  text: The EndConversation tool cannot be blocked by deny rules or prompted by ask rules.
+  source: a deny rule can't remove it while any other tool remains, and an ask rule never prompts for it.

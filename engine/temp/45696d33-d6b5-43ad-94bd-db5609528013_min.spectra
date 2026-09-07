@@ -1,0 +1,40 @@
+module defer_to_resample_ctrlz
+
+env boolean initial_score_above_deferral;
+env boolean any_sample_below_deferral;
+env boolean all_samples_above_deferral;
+env boolean min_above_auditing_threshold;
+env boolean min_hits_higher_threshold;
+sys boolean execute_sample;
+sys boolean resample_two;
+sys boolean implement_t;
+sys boolean audit;
+sys boolean resample_four;
+
+// rule_1
+// rule_2
+// rule_3
+// rule_4
+// rule_5
+// rule_exclusivity
+
+assumption
+	G(!(min_hits_higher_threshold & min_above_auditing_threshold));
+
+assumption
+	!(all_samples_above_deferral & min_hits_higher_threshold);
+
+assumption
+	G(!(min_hits_higher_threshold & all_samples_above_deferral));
+
+assumption
+	!(all_samples_above_deferral & min_above_auditing_threshold);
+
+assumption
+	G(!(min_above_auditing_threshold & all_samples_above_deferral));
+guarantee
+	G(any_sample_below_deferral->execute_sample);
+guarantee
+	G(min_hits_higher_threshold->resample_four);
+guarantee
+	G((execute_sample|resample_two|implement_t|audit|resample_four)&!(execute_sample&resample_two)&!(execute_sample&implement_t)&!(execute_sample&audit)&!(execute_sample&resample_four)&!(resample_two&implement_t)&!(resample_two&audit)&!(resample_two&resample_four)&!(implement_t&audit)&!(implement_t&resample_four)&!(audit&resample_four));

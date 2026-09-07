@@ -1,0 +1,39 @@
+name: openai_agents_guardrails
+description: Control logic for input and output guardrails in OpenAI Agents SDK, determining agent execution and
+  output release based on tripwire status.
+provenance: extracted by gemini-3.1-flash-lite from sources/openai_agents_guardrails.txt; verbatim source in that
+  file
+env:
+- name: input_tripwire_triggered
+  desc: The input guardrail tripwire has been triggered.
+- name: output_tripwire_triggered
+  desc: The output guardrail tripwire has been triggered.
+- name: is_first_agent
+  desc: The agent is the first in the chain.
+- name: is_final_agent
+  desc: The agent produces the final output.
+- name: parallel_execution
+  desc: The agent is configured to run in parallel with input guardrails.
+sys:
+- name: allow_agent_start
+  desc: Permit the agent to begin execution.
+- name: release_output
+  desc: Release the agent's output to the user.
+- name: block_execution
+  desc: Prevent the agent from executing or halt it.
+rules:
+- id: input_guardrail_block
+  text: If the input guardrail tripwire is triggered, the agent must not execute.
+  source: If the guardrail tripwire is triggered, the agent never executes.
+  ambiguity: The behavior when parallel_execution is true and the tripwire triggers after the agent has already
+    started is not explicitly defined as a system action.
+- id: input_guardrail_scope
+  text: Input guardrails only apply if the agent is the first in the chain.
+  source: Input guardrails run only for the first agent in the chain.
+- id: output_guardrail_release
+  text: If the output guardrail tripwire is triggered, the output must not be released.
+  source: If true, an OutputGuardrailTripwireTriggered exception is raised
+  ambiguity: The exact mechanism of the exception handling is not defined, but implies blocking the output.
+- id: output_guardrail_scope
+  text: Output guardrails only apply if the agent produces the final output.
+  source: Output guardrails run only for the agent that produces the final output.

@@ -1,0 +1,2 @@
+Filename,NumRepairs,RepairLimit,TimeToFirst,Runtime,Timeout,TimedOut,NodesExplored,DuplicateNodes,NumInterpolantsComputed,NumNonStateSeparable
+/Users/patrickborman/Documents/policy-checker/out_ext/defer_to_resample_ctrlz.llm.spectra,1,1,57.838178449000004,57.838870212,120.0,False,316,0,315,0

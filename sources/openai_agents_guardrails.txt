@@ -1,0 +1,16 @@
+SOURCE: OpenAI Agents SDK documentation, "Guardrails" (openai.github.io/openai-agents-python/guardrails/). Verbatim passages, fetched 7 Sep 2026.
+
+Input guardrails:
+"Input guardrails run in 3 steps: First, the guardrail receives the same input passed to the agent."
+"Finally, we check if .tripwire_triggered is true. If true, an InputGuardrailTripwireTriggered exception is raised"
+With blocking execution, the guardrail "runs and completes before the agent starts. If the guardrail tripwire is triggered, the agent never executes." With parallel execution (the default), the agent may have already started when the tripwire triggers.
+"Input guardrails run only for the first agent in the chain."
+
+Output guardrails:
+"Output guardrails run in 3 steps: First, the guardrail receives the output produced by the agent."
+"Finally, we check if .tripwire_triggered is true. If true, an OutputGuardrailTripwireTriggered exception is raised"
+"Output guardrails always run after the agent completes, so they don't support the run_in_parallel parameter."
+"Output guardrails run only for the agent that produces the final output."
+
+Tool and handoff guardrails:
+"Tool guardrails do not apply to the handoff call itself. Hosted tools and built-in execution tools also do not use this guardrail pipeline."

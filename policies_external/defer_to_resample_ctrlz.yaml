@@ -1,0 +1,62 @@
+name: defer_to_resample_ctrlz
+description: A control protocol that decides whether to execute a sample, resample, implement a trusted action,
+  or audit based on suspiciousness thresholds.
+provenance: extracted by gemini-3.5-flash from sources/ctrl_z_resample.txt; verbatim source in that file
+env:
+- name: initial_score_above_deferral
+  desc: The initial action's suspiciousness score is above the deferral threshold.
+- name: any_sample_below_deferral
+  desc: At least one of the new samples falls under the deferral threshold.
+- name: all_samples_above_deferral
+  desc: All generated samples are above the deferral threshold.
+- name: min_above_auditing_threshold
+  desc: The minimum suspiciousness score of all samples is above the auditing threshold.
+- name: min_hits_higher_threshold
+  desc: The minimum suspiciousness score of the three samples hits a separate, higher threshold.
+sys:
+- name: execute_sample
+  desc: Execute the least suspicious sample.
+- name: resample_two
+  desc: Generate up to two new samples from U.
+- name: implement_t
+  desc: Implement an action by T.
+- name: audit
+  desc: Audit the most suspicious sample.
+- name: resample_four
+  desc: Sample up to four more actions.
+rules:
+- id: rule_1
+  text: If the initial suspiciousness score is above the deferral threshold, the controller generates up to two
+    new samples.
+  source: If a suspiciousness score is above a deferral threshold, we generate up to two new samples from U.
+  ambiguity: The text does not specify what happens if the initial score is below the deferral threshold.
+- id: rule_2
+  text: If any of the new samples fall under the deferral threshold, the controller executes the least suspicious
+    one.
+  source: If any of these actions fall under the deferral threshold, the protocol executes the least suspicious
+    one.
+  ambiguity: It is unclear if this execution happens immediately or if auditing/further resampling rules can override
+    it.
+- id: rule_3
+  text: If all samples are above the deferral threshold, the controller implements an action by T.
+  source: If all samples are above the deferral threshold, the protocol implements an action by T.
+  ambiguity: It is unclear if implementing T's action is mutually exclusive with auditing or further resampling.
+- id: rule_4
+  text: If the minimum of all samples falls above the auditing threshold, the controller audits the most suspicious
+    sample.
+  source: If the minimum of all the samples falls above a certain auditing threshold, audit the most suspicious
+    sample.
+  ambiguity: It is not specified whether auditing is done in addition to or instead of implementing T's action.
+- id: rule_5
+  text: If the minimum suspiciousness score of the three samples hits the separate higher threshold, the controller
+    samples up to four more actions.
+  source: If the three samples' minimum suspiciousness score hits a separate, higher threshold, the protocol samples
+    up to four more actions.
+  ambiguity: It is not specified how this interacts with the rule to audit or implement T's action when thresholds
+    overlap.
+- id: rule_exclusivity
+  text: The controller does exactly one of its actions per step.
+  source: the 'defer to resample' protocol, as one controller choosing per action between executing a sample, resampling,
+    implementing T's action, and auditing
+  ambiguity: The text describes multiple conditions that could trigger simultaneously (e.g., auditing and implementing
+    T's action), but the prompt implies a single choice per step.

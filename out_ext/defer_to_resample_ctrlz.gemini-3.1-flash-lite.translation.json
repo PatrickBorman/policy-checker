@@ -1,0 +1,58 @@
+{
+  "rules": [
+    {
+      "id": "rule_1",
+      "kind": "guarantee",
+      "spectra": [
+        "G (initial_score_above_deferral -> resample_two)"
+      ],
+      "note": "Direct implication for the resample_two action.",
+      "approximate": false
+    },
+    {
+      "id": "rule_2",
+      "kind": "guarantee",
+      "spectra": [
+        "G (any_sample_below_deferral -> execute_sample)"
+      ],
+      "note": "Direct implication for the execute_sample action.",
+      "approximate": false
+    },
+    {
+      "id": "rule_3",
+      "kind": "guarantee",
+      "spectra": [
+        "G (all_samples_above_deferral -> implement_t)"
+      ],
+      "note": "Direct implication for the implement_t action.",
+      "approximate": false
+    },
+    {
+      "id": "rule_4",
+      "kind": "guarantee",
+      "spectra": [
+        "G (min_above_auditing_threshold -> audit)"
+      ],
+      "note": "Direct implication for the audit action.",
+      "approximate": false
+    },
+    {
+      "id": "rule_5",
+      "kind": "guarantee",
+      "spectra": [
+        "G (min_hits_higher_threshold -> resample_four)"
+      ],
+      "note": "Direct implication for the resample_four action.",
+      "approximate": false
+    },
+    {
+      "id": "rule_exclusivity",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((execute_sample | resample_two | implement_t | audit | resample_four) & !(execute_sample & resample_two) & !(execute_sample & implement_t) & !(execute_sample & audit) & !(execute_sample & resample_four) & !(resample_two & implement_t) & !(resample_two & audit) & !(resample_two & resample_four) & !(implement_t & audit) & !(implement_t & resample_four) & !(audit & resample_four))"
+      ],
+      "note": "Forces exactly one action to be chosen in every step.",
+      "approximate": false
+    }
+  ]
+}

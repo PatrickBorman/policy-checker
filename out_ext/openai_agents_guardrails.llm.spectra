@@ -1,0 +1,23 @@
+module openai_agents_guardrails
+
+env boolean input_tripwire_triggered;
+env boolean output_tripwire_triggered;
+env boolean is_first_agent;
+env boolean is_final_agent;
+env boolean parallel_execution;
+sys boolean allow_agent_start;
+sys boolean release_output;
+sys boolean block_execution;
+
+// input_guardrail_block
+guarantee
+	G (input_tripwire_triggered -> block_execution);
+// input_guardrail_scope
+guarantee
+	G ((input_tripwire_triggered & !is_first_agent) -> !block_execution);
+// output_guardrail_release
+guarantee
+	G (output_tripwire_triggered -> !release_output);
+// output_guardrail_scope
+guarantee
+	G ((output_tripwire_triggered & !is_final_agent) -> release_output);

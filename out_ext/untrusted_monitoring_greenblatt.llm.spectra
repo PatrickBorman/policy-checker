@@ -1,0 +1,24 @@
+module untrusted_monitoring_greenblatt
+
+env boolean suspiciousness_above_threshold;
+env boolean false_negative_rate_too_high;
+env boolean honeypot_phase;
+sys boolean submit;
+sys boolean audit;
+sys boolean shut_down;
+
+// rule_1
+guarantee
+	G ((honeypot_phase & false_negative_rate_too_high) -> shut_down);
+// rule_2
+guarantee
+	G ((!honeypot_phase & suspiciousness_above_threshold) -> audit);
+// rule_3
+guarantee
+	G ((!honeypot_phase & !suspiciousness_above_threshold) -> submit);
+// rule_4
+guarantee
+	G (submit | audit | shut_down);
+// rule_4
+guarantee
+	G (!(submit & audit) & !(submit & shut_down) & !(audit & shut_down));

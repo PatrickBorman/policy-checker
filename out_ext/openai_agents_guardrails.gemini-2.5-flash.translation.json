@@ -1,0 +1,40 @@
+{
+  "rules": [
+    {
+      "id": "input_guardrail_block",
+      "kind": "guarantee",
+      "spectra": [
+        "G (input_tripwire_triggered -> block_execution)"
+      ],
+      "note": "If the input guardrail tripwire is triggered, the agent must be blocked.",
+      "approximate": false
+    },
+    {
+      "id": "input_guardrail_scope",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((input_tripwire_triggered & !is_first_agent) -> !block_execution)"
+      ],
+      "note": "If the input guardrail tripwire is triggered but the agent is not the first, the agent must not be blocked due to this tripwire.",
+      "approximate": false
+    },
+    {
+      "id": "output_guardrail_release",
+      "kind": "guarantee",
+      "spectra": [
+        "G (output_tripwire_triggered -> !release_output)"
+      ],
+      "note": "If the output guardrail tripwire is triggered, the output must not be released.",
+      "approximate": false
+    },
+    {
+      "id": "output_guardrail_scope",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((output_tripwire_triggered & !is_final_agent) -> release_output)"
+      ],
+      "note": "If the output guardrail tripwire is triggered but the agent is not the final one, the output must be released despite the tripwire.",
+      "approximate": false
+    }
+  ]
+}

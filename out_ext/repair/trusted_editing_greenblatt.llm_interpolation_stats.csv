@@ -1,0 +1,2 @@
+Filename,NumRepairs,RepairLimit,TimeToFirst,Runtime,Timeout,TimedOut,NodesExplored,DuplicateNodes,NumInterpolantsComputed,NumNonStateSeparable
+/Users/patrickborman/Documents/policy-checker/out_ext/trusted_editing_greenblatt.llm.spectra,1,1,0.20341042499999995,0.20395554100000002,120.0,False,2,0,1,0

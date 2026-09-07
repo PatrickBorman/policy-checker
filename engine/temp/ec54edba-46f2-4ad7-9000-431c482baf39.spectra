@@ -1,0 +1,23 @@
+module trusted_editing_greenblatt
+
+env boolean suspicion_top_2_percent;
+env boolean suspicion_top_20_percent;
+sys boolean audit;
+sys boolean use_edited_solution;
+sys boolean use_u_solution;
+
+// audit_rule
+guarantee
+	G (suspicion_top_2_percent -> audit);
+// edited_solution_rule
+guarantee
+	G ((suspicion_top_20_percent & !suspicion_top_2_percent) -> use_edited_solution);
+// u_solution_rule
+guarantee
+	G (!suspicion_top_20_percent -> use_u_solution);
+// mutual_exclusivity
+guarantee
+	G ((audit | use_edited_solution | use_u_solution) & !(audit & use_edited_solution) & !(audit & use_u_solution) & !(use_edited_solution & use_u_solution));
+
+assumption
+	G(!(suspicion_top_2_percent & !suspicion_top_20_percent));

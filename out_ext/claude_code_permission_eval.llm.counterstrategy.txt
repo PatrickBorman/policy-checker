@@ -1,0 +1,9 @@
+Found 1 unrealizable core system variables.
+At line 12 variable block.
+
+Initial Dead State Sf0 <matches_deny_rule:false, matches_ask_rule:true, matches_allow_rule:false, hook_blocks:false, hook_denies:false, hook_asks:false, is_end_conversation:true, mcp_requires_user_interaction:false, connector_set_to_ask:false, block:false>
+	With successors : Sf2
+Initial Dead State Sf1 <matches_deny_rule:false, matches_ask_rule:true, matches_allow_rule:false, hook_blocks:false, hook_denies:false, hook_asks:false, is_end_conversation:true, mcp_requires_user_interaction:false, connector_set_to_ask:false, block:true>
+	With successors : Sf2
+Dead State Sf2 <matches_deny_rule:false, matches_ask_rule:false, matches_allow_rule:false, hook_blocks:false, hook_denies:false, hook_asks:false, is_end_conversation:false, mcp_requires_user_interaction:false, connector_set_to_ask:false>
+	With no successors.

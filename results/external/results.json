@@ -1,0 +1,14 @@
+[
+  {
+    "policy_set": "tm_defer_greenblatt",
+    "source": "policies_external/tm_defer_greenblatt.yaml",
+    "mode": "llm",
+    "rules": 5,
+    "translator": "gemini-3.1-flash-lite",
+    "approximate_rules": [],
+    "t_translate_s": 8.9,
+    "spectra": "out_ext/tm_defer_greenblatt.llm.spectra",
+    "realizable": true,
+    "t_check_s": 1.32
+  }
+]

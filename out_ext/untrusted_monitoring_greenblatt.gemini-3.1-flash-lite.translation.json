@@ -1,0 +1,41 @@
+{
+  "rules": [
+    {
+      "id": "rule_1",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((honeypot_phase & false_negative_rate_too_high) -> shut_down)"
+      ],
+      "note": "Forces shutdown when honeypot phase is active and performance is poor.",
+      "approximate": false
+    },
+    {
+      "id": "rule_2",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((!honeypot_phase & suspiciousness_above_threshold) -> audit)"
+      ],
+      "note": "Forces audit for suspicious proposals outside of honeypot phase.",
+      "approximate": false
+    },
+    {
+      "id": "rule_3",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((!honeypot_phase & !suspiciousness_above_threshold) -> submit)"
+      ],
+      "note": "Forces submission for non-suspicious proposals outside of honeypot phase.",
+      "approximate": false
+    },
+    {
+      "id": "rule_4",
+      "kind": "guarantee",
+      "spectra": [
+        "G (submit | audit | shut_down)",
+        "G (!(submit & audit) & !(submit & shut_down) & !(audit & shut_down))"
+      ],
+      "note": "Enforces that exactly one action is taken in every step.",
+      "approximate": false
+    }
+  ]
+}

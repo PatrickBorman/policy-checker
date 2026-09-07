@@ -1,0 +1,14 @@
+Found 2 unrealizable core system variables.
+At line 5 variable audit.
+At line 7 variable use_u_solution.
+
+Initial Dead State Sf0 <suspicion_top_2_percent:true, suspicion_top_20_percent:false, audit:false, use_u_solution:false>
+	With successors : Sf4
+Initial Dead State Sf1 <suspicion_top_2_percent:true, suspicion_top_20_percent:false, audit:false, use_u_solution:true>
+	With successors : Sf4
+Initial Dead State Sf2 <suspicion_top_2_percent:true, suspicion_top_20_percent:false, audit:true, use_u_solution:false>
+	With successors : Sf4
+Initial Dead State Sf3 <suspicion_top_2_percent:true, suspicion_top_20_percent:false, audit:true, use_u_solution:true>
+	With successors : Sf4
+Dead State Sf4 <suspicion_top_2_percent:false, suspicion_top_20_percent:false>
+	With no successors.

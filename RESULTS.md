@@ -72,6 +72,15 @@ each time: equivalent encodings that expose the conflict through a different rul
 
 Times per set: translation median 5.6 s (free tier), realisability check 1.2 s, repair 2.1 s.
 
+## 4. External-source test (see EXTERNAL.md)
+
+Six policy sets extracted by LLM from verbatim passages of two papers and two product documents, no
+hand-written reference. Two realisable; four unrealisable - and on inspection **all four are modelling artefacts**
+of the prose-to-rules step (dropped threshold subset relations, dropped precedence, a scope statement read as an
+obligation, an exclusivity induced by the extraction prompt). Zero genuine conflicts in the sources. In three of
+the four the repair engine returned exactly the fact the extraction had lost. The conflict rate above is a
+property of the hand-written corpus; on external prose the weak link is extraction, not checking.
+
 ## What this does and does not show
 
 Shown: (a) a pipeline from policy English to a solver verdict with an explained counter-trace and a verified

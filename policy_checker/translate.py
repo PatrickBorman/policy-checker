@@ -176,15 +176,41 @@ class GeminiClient:
         self.model = model or os.environ.get("POLICY_CHECKER_GEMINI_MODEL", GEMINI_MODEL)
         self.client = genai.Client()   # reads GEMINI_API_KEY / GOOGLE_API_KEY
 
+    def structured(self, system: str, contents, schema):
+        """Any structured-output call with free-tier quota handling: wait out per-minute 429s, and on a per-day
+        429 move to the next model in GEMINI_FALLBACKS."""
+        from google.genai import errors, types
+        while True:
+            try:
+                resp = self.client.models.generate_content(
+                    model=self.model, contents=contents,
+                    config=types.GenerateContentConfig(system_instruction=system, response_mime_type="application/json",
+                                                       response_schema=schema, temperature=0))
+                return schema.model_validate_json(resp.text)
+            except (errors.ClientError, errors.ServerError) as e:
+                msg = str(e)
+                if ("429" in msg and "PerDay" in msg) or "503" in msg:
+                    nxt = [m for m in GEMINI_FALLBACKS if m != self.model and GEMINI_FALLBACKS.index(m) > GEMINI_FALLBACKS.index(self.model)] if self.model in GEMINI_FALLBACKS else []
+                    if not nxt:
+                        raise
+                    self.model = nxt[0]
+                    continue
+                if "429" in msg:
+                    import re, time
+                    m = re.search(r"retry in ([\d.]+)s", msg)
+                    time.sleep(min(float(m.group(1)) if m else 20, 65) + 1)
+                    continue
+                raise
+
     def complete(self, messages) -> Translation:
         """Free-tier daily quotas are small (20/day on 3.5-flash); on a per-day 429 move to the next model."""
         from google.genai import errors
         while True:
             try:
                 return self._complete(messages)
-            except errors.ClientError as e:
+            except (errors.ClientError, errors.ServerError) as e:
                 msg = str(e)
-                if "429" in msg and "PerDay" in msg:
+                if ("429" in msg and "PerDay" in msg) or "503" in msg:
                     nxt = [m for m in GEMINI_FALLBACKS if m != self.model and GEMINI_FALLBACKS.index(m) > GEMINI_FALLBACKS.index(self.model)] if self.model in GEMINI_FALLBACKS else []
                     if not nxt:
                         raise

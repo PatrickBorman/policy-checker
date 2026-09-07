@@ -1,0 +1,28 @@
+module tm_defer_greenblatt
+
+env boolean suspicious_below_threshold;
+env boolean top_2_percent;
+env boolean more_suspicious_than_expected;
+sys boolean submit_u;
+sys boolean submit_t;
+sys boolean audit;
+sys boolean shutdown;
+
+// exclusivity
+guarantee
+	G (submit_u | submit_t | audit | shutdown);
+// exclusivity
+guarantee
+	G (!(submit_u & submit_t) & !(submit_u & audit) & !(submit_u & shutdown) & !(submit_t & audit) & !(submit_t & shutdown) & !(audit & shutdown));
+// shutdown_rule
+guarantee
+	G (more_suspicious_than_expected -> shutdown);
+// audit_rule
+guarantee
+	G ((top_2_percent & !shutdown) -> audit);
+// submit_u_rule
+guarantee
+	G ((!shutdown & !audit & suspicious_below_threshold) -> submit_u);
+// submit_t_rule
+guarantee
+	G ((!shutdown & !audit & !suspicious_below_threshold) -> submit_t);

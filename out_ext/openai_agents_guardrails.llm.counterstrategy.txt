@@ -1,0 +1,9 @@
+Found 1 unrealizable core system variables.
+At line 9 variable release_output.
+
+Initial Dead State Sf0 <input_tripwire_triggered:false, output_tripwire_triggered:true, is_first_agent:false, is_final_agent:false, parallel_execution:false, release_output:false>
+	With successors : Sf2
+Initial Dead State Sf1 <input_tripwire_triggered:false, output_tripwire_triggered:true, is_first_agent:false, is_final_agent:false, parallel_execution:false, release_output:true>
+	With successors : Sf2
+Dead State Sf2 <input_tripwire_triggered:false, output_tripwire_triggered:false, is_first_agent:false, is_final_agent:false, parallel_execution:false>
+	With no successors.

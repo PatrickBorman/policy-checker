@@ -1,0 +1,36 @@
+module claude_code_permission_eval
+
+env boolean matches_deny_rule;
+env boolean matches_ask_rule;
+env boolean matches_allow_rule;
+env boolean hook_blocks;
+env boolean hook_denies;
+env boolean hook_asks;
+env boolean is_end_conversation;
+env boolean mcp_requires_user_interaction;
+env boolean connector_set_to_ask;
+sys boolean block;
+sys boolean prompt;
+sys boolean proceed;
+
+// hook_block_precedence
+guarantee
+	G (hook_blocks -> block);
+// deny_rule_precedence
+guarantee
+	G (matches_deny_rule -> block);
+// ask_rule_precedence
+guarantee
+	G (matches_ask_rule -> prompt);
+// mcp_interaction_requirement
+guarantee
+	G ((mcp_requires_user_interaction | connector_set_to_ask) -> prompt);
+// allow_rule_fallback (approximate)
+guarantee
+	G ((!matches_deny_rule & !matches_ask_rule & !hook_blocks & !hook_denies & !hook_asks & !mcp_requires_user_interaction & !connector_set_to_ask & matches_allow_rule) -> proceed);
+// end_conversation_exception
+guarantee
+	G ((is_end_conversation & matches_deny_rule) -> !block);
+// end_conversation_exception
+guarantee
+	G ((is_end_conversation & matches_ask_rule) -> !prompt);

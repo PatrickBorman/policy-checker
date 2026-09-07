@@ -1,0 +1,59 @@
+{
+  "rules": [
+    {
+      "id": "hook_block_precedence",
+      "kind": "guarantee",
+      "spectra": [
+        "G (hook_blocks -> block)"
+      ],
+      "note": "If a hook blocks the call, the controller must block.",
+      "approximate": false
+    },
+    {
+      "id": "deny_rule_precedence",
+      "kind": "guarantee",
+      "spectra": [
+        "G (matches_deny_rule -> block)"
+      ],
+      "note": "If the call matches a deny rule, the controller must block.",
+      "approximate": false
+    },
+    {
+      "id": "ask_rule_precedence",
+      "kind": "guarantee",
+      "spectra": [
+        "G (matches_ask_rule -> prompt)"
+      ],
+      "note": "If the call matches an ask rule, the controller must prompt.",
+      "approximate": false
+    },
+    {
+      "id": "mcp_interaction_requirement",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((mcp_requires_user_interaction | connector_set_to_ask) -> prompt)"
+      ],
+      "note": "If the tool is an MCP tool requiring interaction or a connector set to ask, the controller must prompt.",
+      "approximate": false
+    },
+    {
+      "id": "allow_rule_fallback",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((!matches_deny_rule & !matches_ask_rule & !hook_blocks & !hook_denies & !hook_asks & !mcp_requires_user_interaction & !connector_set_to_ask & matches_allow_rule) -> proceed)"
+      ],
+      "note": "If no deny or ask conditions (including hooks and settings) are met, proceed if an allow rule matches.",
+      "approximate": true
+    },
+    {
+      "id": "end_conversation_exception",
+      "kind": "guarantee",
+      "spectra": [
+        "G ((is_end_conversation & matches_deny_rule) -> !block)",
+        "G ((is_end_conversation & matches_ask_rule) -> !prompt)"
+      ],
+      "note": "The EndConversation tool cannot be blocked by deny rules or prompted by ask rules.",
+      "approximate": false
+    }
+  ]
+}

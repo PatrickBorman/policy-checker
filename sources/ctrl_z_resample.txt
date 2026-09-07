@@ -1,0 +1,7 @@
+SOURCE: Bhatt et al., "Ctrl-Z: Controlling AI Agents via Resampling" (arXiv 2504.10374). Verbatim protocol definition, fetched 7 Sep 2026.
+
+Defer to resample:
+"The trusted monitor gives suspiciousness scores to U's actions. If a suspiciousness score is above a deferral threshold, we generate up to two new samples from U."
+"If any of these actions fall under the deferral threshold, the protocol executes the least suspicious one. If all samples are above the deferral threshold, the protocol implements an action by T."
+"If the minimum of all the samples falls above a certain auditing threshold, audit the most suspicious sample."
+"If the three samples' minimum suspiciousness score hits a separate, higher threshold, the protocol samples up to four more actions."
