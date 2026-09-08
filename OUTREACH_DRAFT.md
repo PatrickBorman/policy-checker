@@ -26,7 +26,7 @@ common gap: the papers specify "audit the top X%" and a finite budget but never 
 proposal arrives after the budget is spent. defer-to-resample has an ordering conflict even before any budget.
 It's cross-validated by an independent brute-force checker that shares no code with the formal one.
 
-Repo (runs from a clean clone): [link]. The write-up is SAFETYCASE.md; the finding is a page.
+Repo (runs from a clean clone): https://github.com/PatrickBorman/policy-checker. The write-up is SAFETYCASE.md; the finding is a page.
 
 The honest limitation is the reason I'm writing: this is a specification-level result on public protocols, which
 are either too simple to conflict or resolve the gap silently in code. The one thing I can't do from outside is

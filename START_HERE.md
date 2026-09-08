@@ -29,7 +29,10 @@ DONE:
 - The outreach message drafted.
 
 NOT DONE — and all three are yours, they need you not me:
-1. **Push the repo to GitHub.** It's a "publish", so I won't do it for you. Make an empty repo called
+1. ~~Push the repo to GitHub~~ DONE: https://github.com/PatrickBorman/policy-checker
+   (superseded — kept for reference)
+
+   Original instructions: It's a "publish", so I won't do it for you. Make an empty repo called
    policy-checker on github.com, then in a terminal:
        cd ~/Documents/policy-checker
        git remote add origin git@github.com:<your-username>/policy-checker.git
