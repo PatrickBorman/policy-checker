@@ -1,40 +1,42 @@
-# Draft outreach — Control team (Eric Winsor / Xander Davies), or the Control Red Team recruiter
+# Draft outreach — AISI Control team (Eric Winsor / Xander Davies)
 
-Not to be sent until: (1) repo pushed to GitHub and the link works from a clean clone; (2) you've read it in
-your own voice and cut anything that isn't yours. Keep it short — this is a door-opener, not the paper.
+First send. Same people your EOI reaches, so this is the substance behind it. Send only once you can
+explain it in your own words (EXPLAINER.md) and after the repo link works. Read once as yourself and cut
+anything that isn't how you'd say it.
 
 ---
 
-**Subject:** Totality as an unchecked precondition in control safety cases — a small finding on ControlArena
+**Subject:** A consistency check for control protocols — small finding on ControlArena, and a question
 
-Hi [name],
+Hi Eric / Xander,
 
-I revisited my MSc work (GR(1) specification repair, supervised by Dalal Alrajeh at Imperial) and pointed it at
-AI control, and found something small but concrete I thought the Control team might want.
+I submitted an EOI for the agentic controls work; this is the substance behind it, and a genuine question
+I'd value your read on.
 
-A control safety case assumes the protocol is *total* — that it has a legal action in every environment it can
-reach. Nothing in the current methodology checks that, and a control evaluation can't surface a violation,
-because a protocol with no legal action deadlocks rather than misbehaves, and scores no attack success. Totality
-is just realisability, so it's mechanically checkable.
+Control protocols are rule sets, and a rule set can reach a state where every action is forbidden by some
+rule — the protocol has no legal move. That's an internal-consistency property (a realisability check), and
+it's separate from the empirical safety/usefulness question: a protocol can be perfectly good against attacks
+and still have a reachable state it deadlocks in, which an attack-success evaluation won't surface because a
+stuck protocol scores nothing.
 
-I encoded ControlArena's four online micro-protocols and checked them: all four are total as implemented. They're
-total because auditing, budgets and shutdown are computed post-hoc rather than enforced online. When I compose
-each protocol with the online obligation its own source paper states (audit the top X%, shut down on excess
-suspicion, honeypot checks) under a finite audit budget — which a live deployment must enforce — all four become
-non-total, each in about two seconds, each with a one-step counter-trace and the assumption that repairs it. The
-common gap: the papers specify "audit the top X%" and a finite budget but never say what happens when a must-audit
-proposal arrives after the budget is spent. defer-to-resample has an ordering conflict even before any budget.
-It's cross-validated by an independent brute-force checker that shares no code with the formal one.
+I encoded ControlArena's four online micro-protocols and checked them. As implemented they're consistent —
+and that's because auditing, budgets and shutdown are computed post-hoc, not enforced online. Compose each
+with the online obligation its source paper states, under a finite audit budget (what a live deployment must
+do), and all four hit a state with no legal move — the shared gap being "audit the top X%" plus "the budget
+is finite" with nothing specified for a must-audit case after the budget is spent. Repo, runs from a clean
+clone: https://github.com/PatrickBorman/policy-checker (one-page write-up: SAFETYCASE.md).
 
-Repo (runs from a clean clone): https://github.com/PatrickBorman/policy-checker. The write-up is SAFETYCASE.md; the finding is a page.
+Now the honest part, because you'll see it immediately. Most of these are single-state contradictions — the
+rules are jointly unsatisfiable in one reachable state — not the harder reactive case where an adversary
+forces a corner over time. On toy protocols the check is close to trivial; the reactive machinery only earns
+its keep on protocols that carry state over time (budgets that deplete, counters, rate limits), and I can't
+demonstrate that on public material because the public protocols are too simple. I also note the closest
+formal work (Griffin/Thomson/Shlegeris/Abate, Games for AI Control) assumes protocols are well-defined rather
+than checking it.
 
-The honest limitation is the reason I'm writing: this is a specification-level result on public protocols, which
-are either too simple to conflict or resolve the gap silently in code. The one thing I can't do from outside is
-run it on a real control stack — a protocol composing several online obligations, the kind that would actually
-have a gap its authors didn't intend. If that's of any interest, I'd value even a short conversation.
-
-I'm applying to the Control Red Team role / I've submitted an EOI for the agentic controls work; this is the
-substance behind it either way.
+So my question is direct: is protocol-level consistency something you already treat as trivially handled in
+practice, or is it a real unchecked precondition of a control safety case worth a tool? I'd rather know than
+guess — and if it's the latter, the thing I'd want is a more realistic, stateful protocol to point it at.
 
 Best,
 Patrick
