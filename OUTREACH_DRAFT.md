@@ -1,49 +1,44 @@
-# Draft outreach — AISI Control team (Eric Winsor / Xander Davies)
+# Email to send — AISI Control team (Eric Winsor / Xander Davies)
 
-First send; same people your EOI reaches. Send once you can say it in your own words and the repo link works.
-Leads with the safety-vs-usefulness realisability tension (the defensible, in-their-currency framing), states
-the limitation, and stays a question. Read as yourself and cut anything that isn't how you'd say it.
+Ready to send. Repo link is in. Frames the consistency work as a precursor and signals the real interest:
+applying formal verification as a real-time controller (shielding). Read once as yourself before sending.
+
+TO: (see routing note at bottom)
+SUBJECT: Precursor to a real-time control shield — a realisability question on ControlArena
 
 ---
 
-**Subject:** Do control safety cases assume an adversary-fairness condition they can't enforce?
-
 Hi Eric / Xander,
 
-I submitted an EOI for the agentic controls work; here's the substance behind it and a question I'd value
-your read on.
+I've submitted an EOI for the agentic controls work; this is the substance behind it, and where I'd like to
+take it.
 
-A control protocol carries two claims: safety (suspicious actions don't get executed) and usefulness (real
-work still gets done). Usefulness is a liveness property, and under a finite audit budget it collides with
-safety in a specific way. I checked it as a reactive-synthesis (realisability) question rather than
-empirically:
-
-- "Never execute a suspicious action" + "make progress infinitely often", against an adversary who can keep
-  producing suspicious-looking actions, is UNREALISABLE — no shield achieves both.
-- Add one assumption — that suspicion isn't permanent (infinitely often a clean action arrives) — and it
-  becomes realisable.
-
-So a protocol's safety and usefulness numbers are both computed under an implicit assumption that the adversary
-eventually relents (equivalently, that audit capacity isn't exhausted) — which a real deployment can't enforce.
-At exhaustion the protocol has to silently pick fail-open (execute unaudited: safety claim breaks) or
-fail-closed (refuse: usefulness claim breaks, and burning the budget becomes a denial-of-service). Either way
-the reported figures describe a protocol that isn't the one running after exhaustion.
+As a first probe I treated control protocols as rule sets and checked them for realisability — whether a
+controller can satisfy every rule against an adversarial environment, or whether some reachable situation
+leaves no legal move. Encoding ControlArena's micro-protocols and composing each with the online audit
+obligation its source paper states (audit the top X%, under a finite budget), the interesting case is the
+collision between safety ("never execute a suspicious action") and usefulness ("make progress infinitely
+often"): against an adversary who can keep producing suspicious actions it's unrealisable, and it only becomes
+realisable if you assume suspicion isn't permanent — an adversary-fairness condition a real deployment can't
+enforce. At exhaustion the protocol has to silently pick fail-open (safety breaks) or fail-closed (usefulness
+breaks; burning the budget becomes a DoS), and the reported numbers assume neither.
 
 Repo, runs from a clean clone: https://github.com/PatrickBorman/policy-checker (SAFETYCASE.md is a page).
 
-Being upfront about scope, because you'd raise it:
-- This is a specification/realisability observation, not a bug in ControlArena's code — the code keeps auditing
-  post-hoc, which sidesteps it. I encoded the routing logic of the micro-protocols, not the models or sandbox.
-- The qualitative result above genuinely needs reactive synthesis (a one-step or reachability check can't see
-  it — safety holds in every individual state). A *quantitative* threshold (audit cost vs replenish rate) does
-  NOT — GR(1)'s "infinitely often" is too coarse; that would need energy games, which I flag as out of scope
-  rather than claim. And most simpler policy conflicts I found are single-state, where a SAT check suffices.
+I want to be straight about scope: the offline consistency part is a precursor, not the hard problem — most of
+what it catches is single-state and a SAT check would do; the reactive engine only earns its place on the
+safety-vs-usefulness liveness case above. It's a specification-level observation, not a bug in your code.
 
-My question: does a control safety case price what happens at audit-budget exhaustion — i.e. does it discharge
-the adversary-fairness / unbounded-audit assumption, or treat the totalisation as an implementation default? If
-it's the latter, the thing worth building is the quantified version: a protocol's safety/usefulness under
-fail-open vs fail-closed, in your own evaluation setup. I'd value knowing whether that's a real gap before I
-invest in it.
+Where I actually want to go is the real-time version: formal verification as an online controller / shield that
+sits in the agent loop and blocks unsafe actions, with the offline realisability check as its precondition (a
+shield exists only if the spec is realisable). The open problems that interest me are the ones that make it
+hard in practice — grounding the abstract predicates in real tool-calls, getting the adversary model right, and
+the quantitative/budgeted cases that fall outside GR(1). My MSc was on GR(1) specification repair, so this is
+the direction I'm trying to build toward.
+
+My question: is real-time shielding / runtime enforcement something the Control team sees as a live direction,
+and is protocol-level realisability a precondition you'd want checked — or is it treated as hygiene today? I'd
+value your read before I invest further, and I'd welcome a short conversation.
 
 Best,
 Patrick
