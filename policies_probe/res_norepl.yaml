@@ -1,0 +1,19 @@
+name: res_norepl
+description: resource game, NO replenishment - budget only ever drains.
+env:
+  - {name: sus, desc: suspicious action this step}
+sys:
+  - {name: audit, desc: safely handle it (progress) - costs 1 budget}
+  - {name: block, desc: refuse it (no progress, no cost)}
+  - {name: b1, desc: budget >= 1}
+  - {name: b2, desc: budget >= 2}
+rules:
+  - {id: JAM, kind: assumption, text: adversary jams forever (worst case), spectra: "G (sus)"}
+  - {id: L0, kind: guarantee, text: exactly one of audit/block, spectra: "G ((audit | block) & !(audit & block))"}
+  - {id: INIT, kind: guarantee, text: budget starts at 2, spectra: "b1 & b2"}
+  - {id: MONO, kind: guarantee, text: monotone, spectra: "G (b2 -> b1)"}
+  - {id: DEC2, kind: guarantee, text: audit at 2 -> 1, spectra: "G ((audit & b2) -> (next(b1) & !next(b2)))"}
+  - {id: DEC1, kind: guarantee, text: audit at 1 -> 0, spectra: "G ((audit & b1 & !b2) -> (!next(b1) & !next(b2)))"}
+  - {id: CANT, kind: guarantee, text: no audit at budget 0, spectra: "G (!b1 -> !audit)"}
+  - {id: LIVE, kind: guarantee, text: progress (audit) infinitely often, spectra: "GF (audit)"}
+  - {id: KEEP, kind: guarantee, text: no-audit leaves budget unchanged, spectra: "G (!audit -> ((next(b1) <-> b1) & (next(b2) <-> b2)))"}

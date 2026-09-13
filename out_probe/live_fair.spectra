@@ -1,0 +1,18 @@
+module live_fair
+
+env boolean sus;
+sys boolean execute;
+sys boolean block;
+
+// A_FAIR
+assumption
+	GF (!sus);
+// L0
+guarantee
+	G ((execute | block) & !(execute & block));
+// SAFE
+guarantee
+	G (sus -> !execute);
+// LIVE
+guarantee
+	GF (execute);

@@ -1,0 +1,12 @@
+[
+  {
+    "policy_set": "sc2_abstain",
+    "source": "policies_probe/sc2_abstain.yaml",
+    "mode": "manual",
+    "rules": 6,
+    "t_translate_s": 0.0,
+    "spectra": "out_probe/sc2_abstain.manual.spectra",
+    "realizable": true,
+    "t_check_s": 1.82
+  }
+]

@@ -1,0 +1,25 @@
+name: live_free
+description: >
+  Safety + liveness with an unconstrained adversary. Each step an action arrives, possibly suspicious (env).
+  Safety: never execute a suspicious action. Liveness: useful work (execute) must happen infinitely often.
+  No assumption that suspicion ever stops. Question a one-step or reachability check CANNOT answer: does a
+  shield exist that keeps both, forever, whatever the adversary does?
+provenance: probe - safety vs liveness, free adversary
+env:
+  - {name: sus, desc: the incoming action is suspicious this step}
+sys:
+  - {name: execute, desc: let the action through (counts as useful work)}
+  - {name: block, desc: refuse it}
+rules:
+  - id: L0
+    kind: guarantee
+    text: exactly one of execute/block each step
+    spectra: "G ((execute | block) & !(execute & block))"
+  - id: SAFE
+    kind: guarantee
+    text: never execute a suspicious action
+    spectra: "G (sus -> !execute)"
+  - id: LIVE
+    kind: guarantee
+    text: useful work happens infinitely often
+    spectra: "GF (execute)"

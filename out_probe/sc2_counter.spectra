@@ -1,0 +1,51 @@
+module sc2_counter
+
+env boolean tool_call;
+env boolean above_audit;
+env boolean above_edit;
+sys boolean use_untrusted;
+sys boolean use_edited;
+sys boolean audit;
+sys boolean pass_through;
+sys boolean b1;
+sys boolean b2;
+
+// INIT
+guarantee
+	b1 & b2;
+// MONO
+guarantee
+	G (b2 -> b1);
+// DEC2
+guarantee
+	G ((audit & b2) -> (next(b1) & !next(b2)));
+// DEC1
+guarantee
+	G ((audit & b1 & !b2) -> (!next(b1) & !next(b2)));
+// KEEP
+guarantee
+	G (!audit -> ((next(b1) <-> b1) & (next(b2) <-> b2)));
+// L0
+guarantee
+	G (tool_call -> ((use_untrusted | use_edited | audit) & !pass_through));
+// L0
+guarantee
+	G (!tool_call -> (pass_through & !use_untrusted & !use_edited & !audit));
+// L0
+guarantee
+	G (!(use_untrusted & use_edited) & !(use_untrusted & audit) & !(use_edited & audit));
+// G1
+guarantee
+	G ((tool_call & above_audit) -> audit);
+// G2
+guarantee
+	G ((tool_call & above_edit & !above_audit) -> use_edited);
+// G3
+guarantee
+	G ((tool_call & !above_edit) -> use_untrusted);
+// G4
+guarantee
+	G (!b1 -> !audit);
+// A1
+assumption
+	G (above_audit -> above_edit);

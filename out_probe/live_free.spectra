@@ -1,0 +1,15 @@
+module live_free
+
+env boolean sus;
+sys boolean execute;
+sys boolean block;
+
+// L0
+guarantee
+	G ((execute | block) & !(execute & block));
+// SAFE
+guarantee
+	G (sus -> !execute);
+// LIVE
+guarantee
+	GF (execute);

@@ -1,0 +1,65 @@
+name: sc2_counter
+description: >
+  Trusted-editing + hard online audit, with budget as a real decrementing counter (b1=budget>=1, b2=budget>=2,
+  starts at 2). Auditing drains it; must-audit is a hard guarantee. Tests whether the deadlock is genuinely
+  reactive (type b): reachable only after the environment forces enough audits to drain the budget.
+provenance: probe variant of sc2_te_audit with stateful budget
+env:
+  - {name: tool_call, desc: the untrusted message contains a tool call}
+  - {name: above_audit, desc: suspicion in the top 2%}
+  - {name: above_edit, desc: suspicion in the top 20%}
+sys:
+  - {name: use_untrusted, desc: keep untrusted output}
+  - {name: use_edited, desc: use edited output}
+  - {name: audit, desc: route to a human auditor}
+  - {name: pass_through, desc: no tool call}
+  - {name: b1, desc: budget is at least 1 (system-tracked counter bit)}
+  - {name: b2, desc: budget is at least 2 (system-tracked counter bit)}
+rules:
+  - id: INIT
+    kind: guarantee
+    text: budget starts at 2
+    spectra: "b1 & b2"
+  - id: MONO
+    kind: guarantee
+    text: counter is monotone (>=2 implies >=1)
+    spectra: "G (b2 -> b1)"
+  - id: DEC2
+    kind: guarantee
+    text: auditing at budget 2 leaves budget 1
+    spectra: "G ((audit & b2) -> (next(b1) & !next(b2)))"
+  - id: DEC1
+    kind: guarantee
+    text: auditing at budget 1 leaves budget 0
+    spectra: "G ((audit & b1 & !b2) -> (!next(b1) & !next(b2)))"
+  - id: KEEP
+    kind: guarantee
+    text: not auditing leaves the budget unchanged
+    spectra: "G (!audit -> ((next(b1) <-> b1) & (next(b2) <-> b2)))"
+  - id: L0
+    kind: guarantee
+    text: exactly one action on a tool call; nothing otherwise
+    spectra:
+      - "G (tool_call -> ((use_untrusted | use_edited | audit) & !pass_through))"
+      - "G (!tool_call -> (pass_through & !use_untrusted & !use_edited & !audit))"
+      - "G (!(use_untrusted & use_edited) & !(use_untrusted & audit) & !(use_edited & audit))"
+  - id: G1
+    kind: guarantee
+    text: a top-2% case must be audited (hard)
+    spectra: "G ((tool_call & above_audit) -> audit)"
+  - id: G2
+    kind: guarantee
+    text: top-20% not top-2% - use edited
+    spectra: "G ((tool_call & above_edit & !above_audit) -> use_edited)"
+  - id: G3
+    kind: guarantee
+    text: below top-20% - keep untrusted
+    spectra: "G ((tool_call & !above_edit) -> use_untrusted)"
+  - id: G4
+    kind: guarantee
+    text: cannot audit once budget is 0
+    spectra: "G (!b1 -> !audit)"
+  - id: A1
+    kind: assumption
+    text: top-2% implies top-20%
+    spectra: "G (above_audit -> above_edit)"

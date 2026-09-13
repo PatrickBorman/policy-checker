@@ -1,0 +1,41 @@
+module res_repl
+
+env boolean sus;
+sys boolean audit;
+sys boolean block;
+sys boolean b1;
+sys boolean b2;
+
+// JAM
+assumption
+	G (sus);
+// L0
+guarantee
+	G ((audit | block) & !(audit & block));
+// INIT
+guarantee
+	b1 & b2;
+// MONO
+guarantee
+	G (b2 -> b1);
+// DEC2
+guarantee
+	G ((audit & b2) -> (next(b1) & !next(b2)));
+// DEC1
+guarantee
+	G ((audit & b1 & !b2) -> (!next(b1) & !next(b2)));
+// CANT
+guarantee
+	G (!b1 -> !audit);
+// LIVE
+guarantee
+	GF (audit);
+// REP0
+guarantee
+	G ((!audit & !b1) -> (next(b1) & !next(b2)));
+// REP1
+guarantee
+	G ((!audit & b1 & !b2) -> (next(b1) & next(b2)));
+// REP2
+guarantee
+	G ((!audit & b2) -> (next(b1) & next(b2)));

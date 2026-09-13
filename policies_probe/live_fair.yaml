@@ -1,0 +1,28 @@
+name: live_fair
+description: >
+  Identical to live_free, plus the environment assumption that suspicion is not permanent (infinitely often a
+  clean action arrives). Tests whether that single assumption flips realisability - which only an infinite-
+  horizon strategy check can see.
+provenance: probe - safety vs liveness, fair adversary
+env:
+  - {name: sus, desc: the incoming action is suspicious this step}
+sys:
+  - {name: execute, desc: let the action through (counts as useful work)}
+  - {name: block, desc: refuse it}
+rules:
+  - id: A_FAIR
+    kind: assumption
+    text: suspicion is not permanent - infinitely often a clean action arrives
+    spectra: "GF (!sus)"
+  - id: L0
+    kind: guarantee
+    text: exactly one of execute/block each step
+    spectra: "G ((execute | block) & !(execute & block))"
+  - id: SAFE
+    kind: guarantee
+    text: never execute a suspicious action
+    spectra: "G (sus -> !execute)"
+  - id: LIVE
+    kind: guarantee
+    text: useful work happens infinitely often
+    spectra: "GF (execute)"
