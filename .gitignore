@@ -2,3 +2,9 @@ out/
 __pycache__/
 *.pyc
 .env
+
+# personal / internal (not for public repo)
+OUTREACH_DRAFT.md
+OUTREACH_REDWOOD.md
+START_HERE.md
+BRIEFING*.md
